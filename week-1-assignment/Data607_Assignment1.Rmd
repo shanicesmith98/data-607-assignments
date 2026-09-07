@@ -1,0 +1,39 @@
+---
+title: "Data607_Assignment1"
+author: "Shanice Smith"
+date: "`r Sys.Date()`"
+format: html
+execute:
+  echo: true
+---
+
+## Overview
+
+The dataset chosen for the assignment is the **Lung Cancer Risk Factors & Survival Dataset** from Laxmikanta Roy. The CSV was originally found on [Kaggle](https://www.kaggle.com/datasets/laxmikantaroy/lung-cancer-risk-factors-and-survival-dataset "Source"). The dataset contains 2,000 lung cancer patient records spanning 2015-2026 across 60 countries, along with detailed lifestyle, genetic, demographic, and related information.
+
+## Loading Dataset Code Block
+
+```{r}
+url <- "https://raw.githubusercontent.com/shanicesmith98/data-607-assignments/refs/heads/main/week-1-assignment/lung_cancer_dataset.csv"
+lung_cancer_patient_records <- read.csv(url)
+head(lung_cancer_patient_records)
+```
+
+## Subset \# 1 Code Block
+
+```{r}
+#| label: summary of lung patient's BMI
+summary(lung_cancer_patient_records$BMI)
+```
+
+## Subset #1 Code Block
+
+```{r}
+#| label: loading top 6 patients of file with subset
+lung_cancer_patient_records <- lung_cancer_patient_records[, c("Patient_ID", "Diagnosis_Year", "Age_Group", "Risk_Factor_Count")]
+head(lung_cancer_patient_records)
+```
+
+## Conclusions
+
+With this dataset, there's quite a lot of information to gather from the patient records. I'd like to continue digging into the age group and gender demographics, since I wonder if there's a correlation between which genders get diagnosed when or if lung cancer is more persistent in older populations after prolonged smoke exposure. Additionally, I'm curious to see if treatment varies in the past few years, as well as survival months, particularly with the global pandemic crisis of COVID 19 interfering with health care across various countries.
