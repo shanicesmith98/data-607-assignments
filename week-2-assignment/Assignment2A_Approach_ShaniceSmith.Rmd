@@ -1,0 +1,32 @@
+---
+title: "Data607_Assignment2A"
+author: "Shanice Smith"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+## Introduction
+
+The objective of week 2A's assignment is to poll my peers to build a movie rating database and analyze the data in R. I plan on tackling this assignment by asking my peers to fill out an anonymous form and rate several films I'm familiar with that was released in 2026. As of 9/7/2026, I have 15 submissions. I'll manually export the data from the survey, create a PostgreSQL relational database with the ratings data, then export the database to a CSV to store on GitHub, then reference the raw GitHub link in a R markdown file to analyze further in RStudio. As suggested by the assignment notes, the database will include three tables: users, movies, and ratings.
+
+```{sql}
+CREATE TABLE users (
+    user_id SERIAL PRIMARY KEY
+);
+
+CREATE TABLE movies (
+    movie_id SERIAL PRIMARY KEY,
+    movie_name VARCHAR(200) NOT NULL,
+    genre VARCHAR(50)
+);
+
+CREATE TABLE ratings (
+    rating_id SERIAL PRIMARY KEY,
+    user_id INTEGER REFERENCES users(user_id),
+    movie_id INTEGER REFERENCES movies(movie_id),
+    rating INTEGER CHECK (rating BETWEEN 1 AND 5)
+);
+
+```
+
+However, the problem I see coming is that not everyone who participated in the survey has seen all 19 films listed. I'd have to see how do I judge the validity of this dataset. I will not create fake data or a default value for any missing ratings. I might introduce a minimum threshold, so I can query films that has at least a certain number of ratings to be used in this assignment, but more submissions are currently being made and I will need to do more research how to best tackle this problem.
