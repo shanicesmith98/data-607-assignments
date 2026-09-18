@@ -1,0 +1,10 @@
+---
+title: "Data607_Week3A_Assignment"
+author: "Shanice Smith"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+## Approach
+
+This week's assignment involves working with the previous week's assignment on movie ratings. I plan on using the previous survey data I've gathered from 20 participants and exported into a CSV. I will have to handle any missing ratings or data, since not every participant seen all 19 films listed before I can implement a Global Baseline Estimate recommendation system in R. Using the attached assignment spreadsheet, I will use the implementation algorithm with my data to calculate the the Global Baseline Line within RStudio. Lastly, I'll be able to generate a recommended next film to watch for at least one participant.
