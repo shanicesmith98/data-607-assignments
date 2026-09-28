@@ -1,0 +1,63 @@
+---
+title: "Data607_Week3A_Assignment"
+author: "Shanice Smith"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+## Approach
+
+This week's assignment involves working with the previous week's assignment on movie ratings. I plan on using the previous survey data I've gathered from 20 participants and exported into a CSV. I will have to handle any missing ratings or data, since not every participant seen all 19 films listed before I can implement a Global Baseline Estimate recommendation system in R. Using the attached assignment spreadsheet, I will use the recommendation algorithm with my data to calculate the the Global Baseline Line within RStudio. With the algorithm, I'll be able to generate a recommended next film to watch for at least one participant.
+
+## Codebase
+
+Adding in libraries for use:
+
+```{r}
+library(tidyverse)
+library(dplyr)
+```
+
+In order to begin this assignment, I'm loading in the dataframe from the GitHub repo that was used last week. The dataset is limited to only the films seen by at least 10 participants, which is half of the 20 people who volunteered for the survey.
+
+```{r}
+survey_results <- "https://raw.githubusercontent.com/shanicesmith98/data-607-assignments/refs/heads/main/week-2-assignment/latest_movies_survey_results_2a.csv"
+df <- read_csv(survey_results)
+head(df)
+```
+
+The movies seen by at least half of the survey participants are **Michael**, **Obsession**, **Project Hail Mary**, **The Drama**, **Spider Man: Brand New Day**, **The Devil Wears Prada 2**, **Toy Story 5**, and **The Sheep Detectives**. From here, I begin the needed calculations.
+
+The Global Baseline Estimate is result of the **mean movie rating + a movie's rating relative to average + a user's rating relative to average**.
+
+## Mean Movie Rating
+
+I will calculate the global mean of the film ratings of the subset, while excluding any missing values.
+
+```{r}
+global_mean <- mean(
+  df$rating,
+  na.rm = TRUE
+)
+global_mean
+```
+
+Our global mean for film ratings is **4.12**.
+
+## Average User Rating
+
+Here, I'm using the built-in R functions to calculate the user rating average across the user IDs in the df.
+
+```{r}
+user_avg <- aggregate(rating ~ user_id, data = df, FUN = mean)
+user_avg$b_user <- user_avg$rating - global_mean
+names(user_avg)[2] <- "avg_rating"
+
+user_avg
+
+movie_avg <- aggregate(rating ~ movie_name, data = df, FUN = mean)
+movie_avg$b_movie <- movie_avg$rating - global_mean
+names(movie_avg)[2] <- "avg_rating"
+
+movie_avg
+```

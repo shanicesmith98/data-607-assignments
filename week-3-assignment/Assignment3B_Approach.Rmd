@@ -1,0 +1,10 @@
+---
+title: "Assignment3B_Approach"
+author: "Shanice Smith"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+## Approach
+
+In our 3B assignment, we're back to working with SQL. Our objective is to work with time series dataset that allow us to aggregate/calculate the data and still keep our detailed rows intact. I will likely seek out a dataset on Kaggle, or perhaps ask Claude for some fake stock data to mess around with. I will have to add the dataset to my GitHub repo, then load the dataset in RStudio. I will first sort the data by date, then calculate the cumulative average. One challenge I see that I'm still rusty with SQL. It's been a number of years since I've worked as extensively with SQL and databases, and this class is providing me a chance to learn new concepts, as well as dig deep in previous course notes.

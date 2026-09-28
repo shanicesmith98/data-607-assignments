@@ -1,0 +1,15 @@
+---
+title: "Data607_Project1"
+author: "Shanice Smith"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+## Approach
+
+The objective of this assignment is working through the wrangling and format of data using different packages. In order to transform the txt file of Chess tournament results into a tidy CSV file with our desired fields will take several steps, which is an interesting challenge. Leveraging packages such as dplyr for data wrangling/manipulation and tidyr for organizing the structure will become useful. First, I'd have to load in the txt file into RStudio. From there, I can begin to work on cleaning out the inital format of the file. Once I removing any extra noise, like whitespace or missing data, from the file will assist on only filtering out the fields I want to use, such as the Player’s Name, Player’s State, Total Number of Points, Player’s Pre-Rating, and Average Pre Chess Rating of Opponents. Those are fields I want to be used in the generated CSV. I expect some challenges with the formatting piece, so I have explore how to handle wrangling data without a clear machine-readable structure.
+
+## Codebase
+
+
+## Conclusions
