@@ -7,9 +7,75 @@ output: html_document
 
 ## Approach
 
-The objective of this assignment is working through the wrangling and format of data using different packages. In order to transform the txt file of Chess tournament results into a tidy CSV file with our desired fields will take several steps, which is an interesting challenge. Leveraging packages such as dplyr for data wrangling/manipulation and tidyr for organizing the structure will become useful. First, I'd have to load in the txt file into RStudio. From there, I can begin to work on cleaning out the inital format of the file. Once I removing any extra noise, like whitespace or missing data, from the file will assist on only filtering out the fields I want to use, such as the Player’s Name, Player’s State, Total Number of Points, Player’s Pre-Rating, and Average Pre Chess Rating of Opponents. Those are fields I want to be used in the generated CSV. I expect some challenges with the formatting piece, so I have explore how to handle wrangling data without a clear machine-readable structure.
+The objective of this assignment is to work through the wrangling and format of data using different packages. In order to transform the txt file of Chess tournament results into a tidy CSV file with our desired fields will take several steps, which is an interesting challenge. Leveraging packages such as dplyr for data wrangling/manipulation and tidyr for organizing the structure will become useful.
 
-## Codebase
+First, I'd have to load in the txt file into RStudio. From there, I can begin to work on cleaning out the initial format of the file. Once I remove any extra noise, like whitespace, from the file will assist on only filtering out the fields I want to use, such as the Player’s Name, Player’s State, Total Number of Points, Player’s Pre-Rating, and then calculate the new field, Average Pre Chess Rating of Opponents. Those are fields I want to be used in the generated CSV. I expect some challenges with the formatting piece, so I will have to explore how to handle wrangling data without a clear machine-readable structure.
+
+## Codebase (Prep)
+
+```{r}
+# Loading needed libraries
+library(tidyverse)
+library(readr)
+
+# Importing data from GitHub Raw Link
+
+chess_file_import <- "https://raw.githubusercontent.com/shanicesmith98/data-607-assignments/refs/heads/main/week-4-assignment/tournamentinfo.txt"
+chess_file <- readLines(chess_file_import, warn = FALSE) # added the warn arg to hide the final line warning from appearing
+head(chess_file, 10)
+
+```
+
+## Codebase (Clean + Execution)
+
+``` {r}
+# Cleaning the separators and header rows
+file_lines <- chess_file[!str_detect(chess_file, "^-+$")]
+file_lines <- file_lines[-(1:2)]
+
+line1 <- file_lines[seq(1, length(file_lines), by = 2)] 
+line2 <- file_lines[seq(2, length(file_lines), by = 2)]
+p1 <- str_split_fixed(line1, "\\|", 11)
+p2 <- str_split_fixed(line2, "\\|", 11)
+
+glimpse(file_lines)
+
+# Create player df to get existing fields
+
+players <- tibble(
+  id         = as.integer(str_trim(p1[, 1])),
+  name       = str_to_title(str_trim(p1[, 2])),
+  points     = as.numeric(str_trim(p1[, 3])),
+  state      = str_trim(p2[, 1]),
+  pre_rating = as.integer(str_match(p2[, 2], "R:\\s*(\\d+)")[, 2])
+)
+
+opp_ids <- apply(p1[, 4:10], 2, function(x) as.integer(str_extract(x, "\\d+")))
+
+# Calculate field
+
+opp_ratings <- matrix(players$pre_rating[match(opp_ids, players$id)],
+                      nrow = nrow(opp_ids))
+players$games_played   <- rowSums(!is.na(opp_ids))
+players$avg_opp_rating <- round(rowMeans(opp_ratings, na.rm = TRUE))
+```
+
+## Codebase (Test)
+
+```{r}
+# Validate
+
+players %>% filter(id %in% c(1, 41, 62))
+nrow(players)                  # 64
+sum(is.na(players$pre_rating)) # 0
+```
+
+## Codebase (Export)
+```{r}
+players %>%
+  mutate(points = sprintf("%.1f", points)) %>%   # keeps 6.0 instead of 6
+  select(name, state, points, pre_rating, avg_opp_rating) %>%
+  write_csv("chess_ratings.csv")
+```
 
 
-## Conclusions
