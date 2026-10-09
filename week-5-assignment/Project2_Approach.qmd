@@ -28,9 +28,17 @@ As per the project requirements, each of the datasets will follow the same steps
 
 4.  Cleaning and tidying the datasets will happen next, to standardize variable names (casing, naming patterns, turning Y -\> Yes), convert column/row data types to the appropriate formats (ex. dates, numeric). I'll double check once more for any missing or NA records to make sure that's documented and accounted for prior to calculations.
 
-5.  After, I can validate that the cleaned data is matching the unstructure data by verifying missing, duplicates or mislabeled variables are converted to the correct labeling.
+5.  After, I can validate that the cleaned data is matching the unstructured data by verifying missing, duplicates or mislabeled variables are converted to the correct labeling.
 
-6.  Lastly, I'll explore the cleaned and validated data by creating some graphs and charts with `ggplot2` for some simple analysis. Some questions I will have are how do Kia/Hyundai's share of total vehicle thefts change over time, any corand adjusted vs actual gross for the tour.
+6.  Lastly, I'll explore the cleaned and validated data by creating some graphs and charts with `ggplot2` for some simple analysis. Some questions I will have are how do Kia/Hyundai's share of total vehicle thefts change over time, any correlations between age and BMI with existing conditions, and adjusted vs actual gross for the tour.
+
+```{r}
+#| label: LoadingTidyVerse
+#| echo: true
+#| message: false
+#| warning: false
+library(tidyverse)
+```
 
 ## First Dataset — Kia/Hyundai thefts
 

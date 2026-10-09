@@ -25,6 +25,41 @@ ul.task-list li input[type="checkbox"] {
 width: 0.8em;
 margin: 0 0.8em 0.2em -1em;  vertical-align: middle;
 }
+
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+}
+pre.numberSource { margin-left: 3em; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
@@ -3163,9 +3198,12 @@ vertical-align: -.125em;
 <li><p>Read the csv file and inspect the structure of the files, then try to get the headers / columns to store as variables.</p></li>
 <li><p>Reshape the datasets from a wide format into a long format using <code>pivot_longer()</code> , which will collapse the columns into rows. We can also drop any blank records here as well in this step, if missed with <code>values_drop_na = TRUE</code>.</p></li>
 <li><p>Cleaning and tidying the datasets will happen next, to standardize variable names (casing, naming patterns, turning Y -&gt; Yes), convert column/row data types to the appropriate formats (ex. dates, numeric). I’ll double check once more for any missing or NA records to make sure that’s documented and accounted for prior to calculations.</p></li>
-<li><p>After, I can validate that the cleaned data is matching the unstructure data by verifying missing, duplicates or mislabeled variables are converted to the correct labeling.</p></li>
-<li><p>Lastly, I’ll explore the cleaned and validated data by creating some graphs and charts with <code>ggplot2</code> for some simple analysis. Some questions I will have are how do Kia/Hyundai’s share of total vehicle thefts change over time, any corand adjusted vs actual gross for the tour.</p></li>
+<li><p>After, I can validate that the cleaned data is matching the unstructured data by verifying missing, duplicates or mislabeled variables are converted to the correct labeling.</p></li>
+<li><p>Lastly, I’ll explore the cleaned and validated data by creating some graphs and charts with <code>ggplot2</code> for some simple analysis. Some questions I will have are how do Kia/Hyundai’s share of total vehicle thefts change over time, any correlations between age and BMI with existing conditions, and adjusted vs actual gross for the tour.</p></li>
 </ol>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
 </section>
 <section id="first-dataset-kiahyundai-thefts" class="level2">
 <h2 class="anchored" data-anchor-id="first-dataset-kiahyundai-thefts">First Dataset — Kia/Hyundai thefts</h2>
