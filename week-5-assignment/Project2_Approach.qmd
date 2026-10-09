@@ -1,0 +1,57 @@
+---
+title: "Data607_Project2_Approach"
+author: "Shanice Smith"
+date: "10/08/2026"
+format: html
+editor: visual
+---
+
+## Introduction
+
+The objective of Project 2 is to work through importing, tidying and prepping messy data for downstream analysis using `tidyr` and `dplyr`. The following datasets have been chosen, stored as raw CSV files, and could be found in my Week 5 Assignment directory on [GitHub](https://github.com/shanicesmith98/data-607-assignments/tree/main/week-5-assignment):
+
+- Motherboard / Vice's Car Thefts across the USA ([Discussion source](https://brightspace.cuny.edu/d2l/le/content/1344367/viewContent/41523045/View))
+
+- Medical records ([Discussion source](https://brightspace.cuny.edu/d2l/le/content/1344367/viewContent/41523045/View))
+
+- Highest Grossing Concert Tours by Women ([Discussion source](https://brightspace.cuny.edu/d2l/le/content/1344367/viewContent/41523045/View))
+
+## Approach
+
+As per the project requirements, each of the datasets will follow the same steps separately:
+
+1.  Import the raw CSV files from the GitHub directory to preserve the original or scrapped structure. If possible, I will mark any blank records as NA, where needed.
+
+2.  Read the csv file and inspect the structure of the files, then try to get the headers / columns to store as variables.
+
+3.  Reshape the datasets from a wide format into a long format using `pivot_longer()` , which will collapse the columns into rows. We can also drop any blank records here as well in this step, if missed with `values_drop_na = TRUE`.
+
+4.  Cleaning and tidying the datasets will happen next, to standardize variable names (casing, naming patterns, turning Y -\> Yes), convert column/row data types to the appropriate formats (ex. dates, numeric). I'll double check once more for any missing or NA records to make sure that's documented and accounted for prior to calculations.
+
+5.  After, I can validate that the cleaned data is matching the unstructure data by verifying missing, duplicates or mislabeled variables are converted to the correct labeling.
+
+6.  Lastly, I'll explore the cleaned and validated data by creating some graphs and charts with `ggplot2` for some simple analysis. Some questions I will have are how do Kia/Hyundai's share of total vehicle thefts change over time, any corand adjusted vs actual gross for the tour.
+
+## First Dataset — Kia/Hyundai thefts
+
+**Challenges**
+
+- For the car thefts, I anticipate the blank records being a challenge. The missing theft records from certain locations should not be counted as zeroes, but `NA`, which I can fix upon import of the file to avoid any complications - `na.strings = c("", "NA")`.
+
+- Additionally, there are some inconsistencies of formatting of the locations, such as misspellings and the city/county pattern is not always enforced. Those will have to be fixed with a `case_when()` to catch before analysis.
+
+## Second Dataset — Medical records
+
+**Challenges**
+
+- Like the first dataset, I also anticipate the blank records being a challenge here with the medical records. The missing records from certain locations should not be counted as zeroes, but `NA`, which I can fix upon import of the file to avoid any complications - `na.strings = c("", "NA")`.
+
+- Certain variables, such as Smoker, has inconsistent labeling and will need to be reformatted to one standardized pattern.
+
+## Third Dataset — Highest Grossing Concert Tours by Women
+
+**Challenges**
+
+- Rank 7 appears twice (Celine Dion, Pink) and rank 8 is absent, so the ranking will need to be rearranged for
+
+- The format for the numeric variables will need to be stripped to be solely numbers by removing the dollar signs and commas for more reliable calculations.
