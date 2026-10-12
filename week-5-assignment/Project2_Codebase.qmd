@@ -4,6 +4,8 @@ author: "Shanice Smith"
 date: today
 format:
   html:
+    toc: true
+    toc-depth: 3
     code-fold: show
     embed-resources: true 
     df-print: default
@@ -38,7 +40,7 @@ As per the project requirements, each of the datasets will follow the same steps
 
 5.  After, I can validate that the cleaned data is matching the unstructured data by verifying missing, duplicates or mislabeled variables are converted to the correct labeling.
 
-6.  Lastly, I'll explore the cleaned and validated data by creating some graphs and charts with `ggplot2` for some simple analysis. Some questions I will have are how do Kia/Hyundai's share of total vehicle thefts change over time, any correlations between age and BMI with existing conditions, and adjusted vs actual gross for the tour.
+6.  Lastly, I'll explore the cleaned and validated data by creating some graphs and charts with `ggplot2` for some simple analysis. Some questions I will have are how do Kia/Hyundai's share of total vehicle thefts change over time, how the clinical measurements compare across diagnosis groups, and adjusted vs actual gross for the tour.
 
 ```{r}
 #| label: LoadingTidyVerse
@@ -48,6 +50,11 @@ As per the project requirements, each of the datasets will follow the same steps
 
 # helper and import chunk
 library(tidyverse)
+
+set.seed(1234)
+
+theme_set(theme_minimal(base_size = 12))   # one visual style across all three figures
+
 pct_label <- function(x) ifelse(is.na(x), "", paste0(round(x * 100), "%"))
 ```
 
@@ -55,7 +62,7 @@ pct_label <- function(x) ifelse(is.na(x), "", paste0(round(x * 100), "%"))
 
 **Challenges**
 
-- For the car thefts, I anticipate the blank records being a challenge. The missing theft records from certain locations should not be counted as zeroes, but `NA`, which I can fix upon import of the file to avoid any complications - `na.strings = c("", "NA")`.
+- For the car thefts, I anticipate the blank records being a challenge. The missing theft records from certain locations should not be counted as zeroes, but `NA`, which I can fix upon import of the file to avoid any complications - `na = c("", "N/A")`.
 
 - Additionally, there are some inconsistencies of formatting of the locations, such as misspellings and the city/county pattern is not always enforced. Those will have to be fixed with a `case_when()` to catch before analysis.
 
@@ -69,7 +76,7 @@ car_theft_header_rows <- read_csv(car_thefts_raw_url, col_names = FALSE, n_max =
                         col_types = cols(.default = "c"))
 
 car_theft_data_body <- read_csv(car_thefts_raw_url, col_names = FALSE, skip = 2,
-                       na = c("", "NA"),
+                       na = c("", "N/A"),
                        col_types = cols(.default = "c")) # skips double header rows
 
 ```
@@ -83,7 +90,7 @@ head(car_theft_header_rows)
 head(car_theft_data_body)
 ```
 
-We learn here that the data's structure is 45 data rows by 211 columns. Column 1 has the month and year from `Dec/19` through `Aug/23`.Row 1 is a merged city header (a name followed by two empty cells) and row 2 repeats `Kia/Hyundais`, `All`, `Percent` for each of 70 geographies. City and measure are values stored as column names, so 9,450 observations sit in 210 columns.
+We learn here that the data's structure is 45 data rows by 211 columns. Column 1 has the month and year from `Dec/19` through `Aug/23`. Row 1 is a merged city header (a name followed by two empty cells) and row 2 repeats `Kia/Hyundais`, `All`, `Percent` for each of 70 geographies. City and measure are values stored as column names, so 9,450 observations sit in 210 columns.
 
 ### Transformation
 
@@ -102,8 +109,8 @@ header_map <- tibble(
 ) |>
   fill(city, .direction = "down")
 
-n_distinct(header_map$city, na.rm = TRUE)
-count(header_map, measure) # Output is 70 cities / columns
+n_distinct(header_map$city, na.rm = TRUE) # Output is 70 cities / column
+count(header_map, measure) # 3 measures, 70 columns each
 
 ```
 
@@ -154,10 +161,10 @@ dim(theft_tidy)   # expect 3150 x 5
 ```{r}
 #| label: clean-a
 
-theft_tidy <- theft_tidy |>
+theft_tidier <- theft_tidy |>
   mutate(
     # Turning source data format from "Dec/19" -> 2019-12-01
-    month = parse_date(as.character(month), format = "%b/%y"),
+    month = parse_date(month, format = "%b/%y"),
 
     # Strip comma separators from numeric column: "1,014" -> 1014
     across(c(kia_hyundai_thefts, all_thefts), parse_number),
@@ -181,7 +188,7 @@ theft_tidy <- theft_tidy |>
                               NA_real_)
   )
 
-glimpse(theft_tidy)
+glimpse(theft_tidier)
 ```
 
 Column names are now using `snake_case` throughout with `kia_hyundai_thefts` and `all_thefts` count reported thefts per city-month.
@@ -191,7 +198,7 @@ Column names are now using `snake_case` throughout with `kia_hyundai_thefts` and
 ```{r}
 #| label: missingness-a
 
-theft_tidy |>
+theft_tidier |>
   summarise(
     `City-months`      = n(),
     `Both counts`      = sum(!is.na(kia_hyundai_thefts) & !is.na(all_thefts)),
@@ -201,7 +208,13 @@ theft_tidy |>
   )
 ```
 
-Blank cells are kept as `NA` and not marked as zero. Some cities, such as Virginia Beach, Norfolk and Miami never report a total theft count; Frisco and Lincoln never report a Kia/Hyundai count; Atlanta, San Antonio and Henderson begin reporting only in January 2021. Treating those blanks as zeros, which they are not, would create problems with our calculations, so we will filter out any incomplete records here.
+Blank cells are kept as `NA` and not marked as zero. Some cities, such as Virginia
+Beach, Norfolk and Miami never report a total theft count; Frisco and Lincoln never
+report a Kia/Hyundai count; Atlanta, San Antonio and Henderson begin reporting only
+in January 2021. Treating those blanks as zeros would invent a denominator and hand
+me a fake 0% share. I'm not dropping the rows here either — the analysis below
+filters incomplete records only where they would break a calculation, so the counts
+above stay auditable.
 
 ### Analysis
 
@@ -210,7 +223,7 @@ I'm comparing each city's mean monthly Kia/Hyundai share before and after July 2
 ```{r}
 #| label: analysis-a
 
-share_change <- theft_tidy |>
+share_change <- theft_tidier |>
   filter(!is.na(pct_kia_hyundai)) |>
   mutate(period = if_else(month < as.Date("2022-07-01"), "pre", "post")) |>
   group_by(city, period) |>
@@ -239,49 +252,38 @@ share_change |>
 
 ```{r}
 #| label: fig-theft-share-a
-#| fig-cap: "Kia/Hyundai share of reported vehicle thefts in the six cities with the largest increase. Dashed line marks July 2022."
-#| fig-alt: "Line chart of six city series, each rising sharply after mid-2022."
-#| fig-width: 8
+#| fig-cap: "Kia/Hyundai share of reported vehicle thefts in the six cities with the largest increase. The dashed line marks July 2022."
+#| fig-alt: "Six small line charts, one per city, each rising sharply after mid-2022."
+#| fig-width: 9
 #| fig-height: 5
 
 top_cities <- share_change |> slice_max(change_pp, n = 6) |> pull(city)
 
-theft_tidy |>
+theft_tidier |>
   filter(city %in% top_cities, !is.na(pct_kia_hyundai)) |>
-  ggplot(aes(x = month, y = pct_kia_hyundai, color = city)) +
-  geom_line(linewidth = 0.8) +
+  ggplot(aes(x = month, y = pct_kia_hyundai)) +
   geom_vline(xintercept = as.Date("2022-07-01"),
-             linetype = "dashed", color = "grey40") +
+             linetype = "dashed", color = "grey60") +
+  geom_line(color = "steelblue", linewidth = 0.8) +
+  facet_wrap(~ city) +
   scale_y_continuous(labels = pct_label) +
-  scale_x_date(date_breaks = "6 months", date_labels = "%b %Y") +
+  scale_x_date(date_breaks = "1 year", date_labels = "%Y") +
   labs(
-    x       = "Month",
-    y       = "Share of all reported vehicle thefts",
-    color   = "City",
+    x = NULL,
+    y = "Share of all vehicle thefts",
     caption = "Source: Motherboard / VICE News police-record dataset, Dec 2019 - Aug 2023"
   )
 ```
 
 ### Conclusions
 
-The tidy dataset holds `r nrow(theft_tidy)` city-months, `r sum(!is.na(theft_tidy$pct_kia_hyundai))`
-of them with both counts reported, which leaves `r nrow(share_change)` cities with
-enough coverage to compare periods. The biggest jump is `r share_change$city[1]`,
-going from `r round(share_change$mean_share_pre[1] * 100, 1)`% to
-`r round(share_change$mean_share_post[1] * 100, 1)`% — a gain of
-`r round(share_change$change_pp[1], 1)` percentage points — and the median change
-across qualifying cities is `r round(median(share_change$change_pp), 1)` points.
-@fig-theft-share-a shows that rise is sudden rather than gradual, landing mostly in
-late 2022 and holding through August 2023. That fits a vulnerability being exploited
-once it was widely known, not a slow change in what cars are on the road. The main
-limit is coverage: `r sum(is.na(theft_tidy$pct_kia_hyundai))` city-months are missing
-a count, so this describes reporting agencies rather than all 70 locations.
+The tidy dataset holds `r nrow(theft_tidier)` city-months, `r sum(!is.na(theft_tidier$pct_kia_hyundai))` of them with both counts reported, which leaves `r nrow(share_change)` cities with enough coverage to compare periods. The biggest jump is `r share_change$city[1]`, going from `r round(share_change$mean_share_pre[1] * 100, 1)`% to `r round(share_change$mean_share_post[1] * 100, 1)`% — a gain of `r round(share_change$change_pp[1], 1)` percentage points — and the median change across qualifying cities is `r round(median(share_change$change_pp), 1)` points. @fig-theft-share-a shows that rise is sudden rather than gradual, landing mostly in late 2022 and holding through August 2023. That fits a vulnerability being exploited once it was widely known, not a slow change in what cars are on the road. The main limit is coverage: `r sum(is.na(theft_tidier$pct_kia_hyundai))` city-months are missing a count, so this describes reporting agencies rather than all 70 locations.
 
 ## Second Dataset — Medical records
 
 **Challenges**
 
-- Like the first dataset, I also anticipate the blank records being a challenge here with the medical records. The missing records from certain locations should not be counted as zeroes, but `NA`, which I can fix upon import of the file to avoid any complications - `na.strings = c("", "NA")`.
+- Like the first dataset, I also anticipate the blank records being a challenge here with the medical records. The missing records from certain locations should not be counted as zeroes, but `NA`, which I can fix upon import of the file to avoid any complications - `na = c("", "nan", "N/A")`.
 
 - Certain variables, such as Smoker, has inconsistent labeling and will need to be reformatted to one standardized pattern.
 
@@ -295,7 +297,7 @@ medical_records_raw_url <- "https://raw.githubusercontent.com/shanicesmith98/dat
 # NA values have to be addressed here to avoid issues with 'nan' being turned into a catergory
 medical_records_raw_data <- read_csv(
   medical_records_raw_url,
-  na = c("", "nan", "NA"),
+  na = c("", "nan", "N/A"),
   col_types = cols(
     Patient_ID     = col_character(),
     Age            = col_double(),
@@ -319,6 +321,7 @@ medical_records_raw_data <- read_csv(
 dim(medical_records_raw_data)
 names(medical_records_raw_data)
 head(medical_records_raw_data, 5)
+sum(duplicated(medical_records_raw_data$Patient_ID))   # Output: 0
 ```
 
 The raw file is 100 rows by 10 columns, one row per patient, with IDs `P1000` through `P1099` and no duplicates. Four of the columns (`Age`, `Blood_Pressure`, `Cholesterol`, `BMI`) are four separate measurements of the same patient, column names are inconsistently cased, and the categorical columns carry several spellings of the same value.
@@ -336,7 +339,7 @@ count(medical_records_raw_data, Notes)
 
 ### Transformation steps
 
-#### Consistent variable names
+### Consistent variable names
 
 ```{r}
 #| label: rename-b
@@ -357,7 +360,7 @@ med <- medical_records_raw_data |>
   )
 ```
 
-#### Standardizing inconsistent values
+### Standardizing inconsistent values
 
 ```{r}
 #| label: recode-b
@@ -412,12 +415,12 @@ med_tidy <- med |>
     facet_label = str_c(measure_label, " (", unit, ")")
   )
 
-dim(med_tidy)   # Output: 400 x 10
+dim(med_tidy)   # Output: 400 x 12
 ```
 
 The id columns — `patient_id`, `gender`, `is_smoker`, `diagnosis`, `admission_date`, `notes` — are left untouched by the pivot because they describe the *patient*, not the measurement. Only the four measured quantities move. The result is 100 patients × 4 measurements = 400 rows, which is the grain that lets one `group_by()` answer a question about all four measurements at once.
 
-#### Missing-value decisions
+### Missing-value decisions
 
 ```{r}
 #| label: tbl-missingness-b
@@ -437,7 +440,7 @@ No row and no patient is dropped. Every summary below uses `na.rm = TRUE` and re
 
 ### Analysis
 
-Two comparisons, both computed on the long-form data. First, central tendency of each measurement by diagnosis group — mean and median side by side, because the measurements turn out to be pre-binned and a median is the more honest summary of a discretised variable. Second, the difference in mean measurement between self-reported smokers and non-smokers, pooled across diagnosis groups. Counts accompany every figure; nothing is imputed.
+We're doing two comparisons on the long data. First, mean and median of each measurement by diagnosis group — I'm showing both because the measurements are pre-binned, and the median is the more honest summary of a discrete variable. Second, mean measurement for smokers against non-smokers. Counts go with every figure and nothing is imputed.
 
 ```{r}
 #| label: tbl-by-diagnosis-b
@@ -477,19 +480,20 @@ smoker_summary
 
 ```{r}
 #| label: fig-measures-by-diagnosis-b
-#| fig-cap: "Distribution of each clinical measurement by diagnosis group. Boxes show median and interquartile range; patients with unrecorded measurements are excluded from their own panel only."
-#| fig-alt: "Four boxplot panels, one per measurement, comparing diagnosis groups."
+#| fig-cap: "Mean value of each clinical measurement by diagnosis group, labelled with the number of patients reporting that measurement."
+#| fig-alt: "Four panels of bar charts comparing mean measurement values across four diagnosis groups."
 #| fig-width: 9
 #| fig-height: 6
 
-med_tidy |>
-  filter(!is.na(value)) |>
-  ggplot(aes(x = diagnosis_group, y = value)) +
-  geom_boxplot(fill = "grey90", outlier.size = 1) +
-  facet_wrap(~ facet_label, scales = "free_y") +
+med_summary |>
+  ggplot(aes(x = Diagnosis, y = Mean)) +
+  geom_col(fill = "steelblue", width = 0.7) +
+  geom_text(aes(label = str_c("n=", Patients)), vjust = -0.4, size = 3) +
+  facet_wrap(~ Measurement, scales = "free_y") +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.15))) +
   labs(
-    x = "Diagnosis group",
-    y = "Measured value",
+    x = NULL,
+    y = "Mean value",
     caption = "Synthetic teaching dataset; 100 patients, admissions during 2023"
   ) +
   theme(axis.text.x = element_text(angle = 20, hjust = 1))
@@ -497,25 +501,13 @@ med_tidy |>
 
 ### Conclusions
 
-The tidy dataset holds `r nrow(med_tidy)` patient-measurement rows,
-`r sum(!is.na(med_tidy$value))` with a reported value and
-`r sum(is.na(med_tidy$value))` missing. Differences between diagnosis groups are
-small: mean age spans only
-`r min(med_summary$Mean[med_summary$Measurement == "Age (years)"])` to
-`r max(med_summary$Mean[med_summary$Measurement == "Age (years)"])` years, and mean
-blood pressure under 6 mmHg. @fig-measures-by-diagnosis-b shows why — every
-measurement takes just five distinct values, so the data is pre-binned and any real
-difference gets squashed toward the bin width. That rules out correlation or
-regression on these columns, which is why I stopped at group means and medians. I
-also kept `None` (`r sum(med$diagnosis == "None", na.rm = TRUE)` patients, examined
-with nothing found) separate from unrecorded (`r sum(is.na(med$diagnosis))` patients),
-since merging them would overstate how many patients I know are healthy.
+The tidy dataset holds `r nrow(med_tidy)` patient-measurement rows, `r sum(!is.na(med_tidy$value))` with a reported value and `r sum(is.na(med_tidy$value))` missing. Differences between diagnosis groups are small: mean age spans only `r min(med_summary$Mean[med_summary$Measurement == "Age (years)"])` to `r max(med_summary$Mean[med_summary$Measurement == "Age (years)"])` years, and mean blood pressure under 6 mmHg. @fig-measures-by-diagnosis-b shows why — every measurement takes just five distinct values, so the data is pre-binned and any real difference gets squashed toward the bin width. That rules out correlation or regression on these columns, which is why I stopped at group means and medians. I also kept `None` (`r sum(med$diagnosis == "None", na.rm = TRUE)` patients, examined with nothing found) separate from unrecorded (`r sum(is.na(med$diagnosis))` patients), since merging them would overstate how many patients I know are healthy.
 
 ## Third Dataset — Highest Grossing Concert Tours by Women
 
 **Challenges**
 
-- Rank 7 appears twice (Celine Dion, Pink) and rank 8 is absent, so the ranking will need to be rearranged for
+- Rank 7 shows up twice (Celine Dion, Pink) and rank 8 is missing, so I can't trust `Rank` as an identifier and will rank the tours myself.
 
 - The format for the numeric variables will need to be stripped to be solely numbers by removing the dollar signs and commas for more reliable calculations.
 
@@ -556,7 +548,7 @@ A fifth problem is not visible at all: `Rank` is not unique. Rank 7 appears twic
 
 ### Transformation steps
 
-#### Repairing the column names
+### Repairing the column names
 
 ```{r}
 #| label: fix-names-c
@@ -582,7 +574,7 @@ tours <- tours_raw_data |>
   )
 ```
 
-#### Capturing the footnote markers before deleting them
+### Capturing the footnote markers before deleting them
 
 ```{r}
 #| label: flags-c
@@ -602,12 +594,12 @@ sum(tours$has_marker)   # expect 3
 
 The source page's legend is not part of the CSV, so the meaning of `‡` and `*` cannot be recovered from this file. They are recorded in `has_marker` and flagged as an open question rather than guessed at; the two `†` tours are treated as incomplete throughout.
 
-#### Converting text to numbers
+### Converting text to numbers
 
 ```{r}
 #| label: parse-c
 
-# Helper: remove bracketed footnote references like [4], [a], [21].
+# Remove bracketed footnote references like [4], [a], [21].
 strip_notes <- function(x) str_remove_all(x, "\\[[0-9a-z]+\\]")
 
 tours <- tours |>
@@ -629,9 +621,7 @@ tours <- tours |>
   )
 ```
 
-Order matters here. `parse_number("$229,100,000[b]")` applied directly reads the leading number but warns and depends on parser internals; stripping the footnote first makes the conversion unambiguous. For `as.integer()` the stakes are higher — `as.integer("2[5]")` returns `NA`, so six of the seven populated `all_time_peak` values would silently vanish.
-
-#### Splitting the year range
+### Splitting the year range
 
 ```{r}
 #| label: years-c
@@ -650,9 +640,7 @@ tours <- tours |>
   )
 ```
 
-`"2023–2024"` is separated by an en-dash (U+2013). Splitting on `"-"` matches nothing, `too_few = "align_start"` silently fills every `year_end` with `NA`, and all 20 tours appear to be single-year.
-
-#### Reshaping the two gross figures to long form
+### Reshaping the two gross figures to long form
 
 ```{r}
 #| label: pivot-c
@@ -677,7 +665,7 @@ dim(tours_tidy)   # expect 40 x 13
 
 Nominal and inflation-adjusted dollars are the same quantity measured on two bases. Side by side in separate columns they invite direct comparison of figures that are not comparable; stacked, the basis becomes an explicit grouping variable and every chart and table must declare which one it uses.
 
-#### Why the derived column is recomputed
+### Why the derived column is recomputed
 
 ```{r}
 #| label: check-derived-c
@@ -691,7 +679,7 @@ tours |>
   select(tour_title, shows, actual_gross, average_gross, recomputed, difference)
 ```
 
-The stored `average_gross` does not always equal `actual_gross / shows`. The Monster Ball Tour's stored average of \$1,118,227 across 203 shows implies a gross near \$227.0M, while the actual-gross column reads \$227.4M. Rather than reconcile the source's rounding, the per-show figure is recomputed from its components everywhere below.
+I'm comparing the two gross bases by ranking every tour twice, once on nominal and once on adjusted gross, then taking the difference. That difference shows how much inflation adjustment moves the standings. Revenue per show is recomputed as `actual_gross / shows` and reported only for the 18 completed tours, since the two ongoing ones have partial grosses against partial show counts.
 
 ### Analysis
 
@@ -745,7 +733,7 @@ tours |>
 #| fig-cap: "Nominal versus inflation-adjusted gross for each tour, ordered by adjusted gross. Daggered tours were still running when the source table was compiled."
 #| fig-alt: "Dumbbell chart of 20 tours, each with two points connected by a line."
 #| fig-width: 9
-#| fig-height: 7
+#| fig-height: 8
 
 # Order the y-axis by adjusted gross so the chart reads as a ranking
 title_order <- tours |> arrange(adjusted_gross) |> pull(tour_title)
@@ -767,25 +755,10 @@ tours_tidy |>
 
 ### Conclusions
 
-The tidy dataset holds `r nrow(tours_tidy)` rows, `r nrow(tours)` tours on two gross
-bases. Nominal grosses total \$`r round(sum(tours$actual_gross) / 1e9, 2)` billion
-against \$`r round(sum(tours$adjusted_gross) / 1e9, 2)` billion adjusted to 2022
-dollars, and that gap sits almost entirely in the older tours. @fig-gross-basis-c
-shows the two bases pulling apart with age: recent tours are nearly a single point,
-while mid-2000s tours show a wide spread. Cher's *Living Proof: The Farewell Tour*
-climbs from `r rank_shift$rank_nominal[rank_shift$tour_title == "Living Proof: The Farewell Tour"]`
-to `r rank_shift$rank_adjusted[rank_shift$tour_title == "Living Proof: The Farewell Tour"]`
-once adjusted, while Pink's *Summer Carnival* drops from
-`r rank_shift$rank_nominal[rank_shift$tour_title == "Summer Carnival"]` to
-`r rank_shift$rank_adjusted[rank_shift$tour_title == "Summer Carnival"]` — not because
-it earned less, but because it has no inflation behind it. Revenue per show splits two
-business models: the Eras Tour made about \$13.9M per show over 56 shows while Cher's
-run made \$0.6M over 325, and both land near the top. The limits are that
-`source_rank` isn't unique, `all_time_peak` is missing for
-`r sum(is.na(tours$all_time_peak))` of `r nrow(tours)` tours, and
-`r sum(tours$is_ongoing)` tours were still running, so I left them out of the per-show
-table.
+The tidy dataset holds `r nrow(tours_tidy)` rows, `r nrow(tours)` tours on two gross bases. Nominal grosses total \$`r round(sum(tours$actual_gross) / 1e9, 2)` billion against \$`r round(sum(tours$adjusted_gross) / 1e9, 2)` billion adjusted to 2022 dollars, and that gap sits almost entirely in the older tours. @fig-gross-basis-c shows the two bases pulling apart with age: recent tours are nearly a single point, while mid-2000s tours show a wide spread. Cher's *Living Proof: The Farewell Tour* climbs from `r rank_shift$rank_nominal[rank_shift$tour_title == "Living Proof: The Farewell Tour"]` to `r rank_shift$rank_adjusted[rank_shift$tour_title == "Living Proof: The Farewell Tour"]` once adjusted. Pink's *Summer Carnival* drops from `r rank_shift$rank_nominal[rank_shift$tour_title == "Summer Carnival"]` to `r rank_shift$rank_adjusted[rank_shift$tour_title == "Summer Carnival"]`, not because it earned less, but because it has no inflation behind it. Revenue per show splits two business models: the Eras Tour made about \$13.9M per show over 56 shows, Cher's run \$0.6M over 325, and both land near the top. The limits are that `source_rank` isn't unique, `all_time_peak` is missing for `r sum(is.na(tours$all_time_peak))` of `r nrow(tours)` tours, and `r sum(tours$is_ongoing)` tours were still running, so I left them out of the per-show table.
 
 ## Credit
 
-Throughout the assignment, Claude (Opus 5) was used to help plan, explain concepts, flag data issues, and debug errors. Anthropic. (2026). Claude (Opus 5) \[Large language model\]. I ran and verified all code in RStudio, checked the reported figures against the raw files, and wrote the final interpretations myself.
+Throughout the assignment, Claude (Opus 5) was used to help plan, explain concepts, flag data issues, and debug errors. I ran and verified all code in RStudio, checked the reported figures against the raw files, and wrote the final interpretations myself.
+
+Anthropic. (2026). Claude (Opus 5) \[Large language model\].
