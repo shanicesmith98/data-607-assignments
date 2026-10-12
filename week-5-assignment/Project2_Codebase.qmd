@@ -61,9 +61,7 @@ pct_label <- function(x) ifelse(is.na(x), "", paste0(round(x * 100), "%"))
 
 - Additionally, there are some inconsistencies of formatting of the locations, such as misspellings and the city/county pattern is not always enforced. Those will have to be fixed with a `case_when()` to catch before analysis.
 
-### Codebase
-
-#### Loading in CSV
+### Loading in CSV
 
 ```{r}
 #| label: LoadInCarThefts
@@ -78,7 +76,7 @@ car_theft_data_body <- read_csv(car_thefts_raw_url, col_names = FALSE, skip = 2,
 
 ```
 
-## Structure before tidying
+### Structure before tidying
 
 ```{r}
 #| label: inspect-a
@@ -89,7 +87,7 @@ head(car_theft_data_body)
 
 We learn here that the data's structure is 45 data rows by 211 columns. Column 1 has the month and year from `Dec/19` through `Aug/23`.Row 1 is a merged city header (a name followed by two empty cells) and row 2 repeats `Kia/Hyundais`, `All`, `Percent` for each of 70 geographies. City and measure are values stored as column names, so 9,450 observations sit in 210 columns.
 
-## Transformation
+### Transformation
 
 ```{r}
 #| label: rebuild-header-a
@@ -111,7 +109,7 @@ count(header_map, measure) # Output is 70 cities / columns
 
 ```
 
-Trailing space is seen on several cities, which is why `str_trim()` is needed. Otherwise, later in the transformation process, two separate columns would be created instead of one.
+Trailing space is seen on several measure labels, which is why `str_trim()` is needed. Otherwise, later in the transformation process, two separate columns for `All` would be created instead of one.
 
 ```{r}
 #| label: apply-names-a
@@ -209,15 +207,14 @@ theft_tidy |>
 Blank cells are kept as `NA` and not marked as zero. Some cities, such as Virginia Beach,
 Norfolk and Miami never report a total theft count; Frisco and Lincoln never
 report a Kia/Hyundai count; Atlanta, San Antonio and Henderson begin reporting
-only in January 2021. Treating those blanks as zeros would create problems with our data and analysis, so we will drop any incomplete records from `theft_tidy` here.
+only in January 2021. Treating those blanks as zeros, which they are not, would create problems with our calculations, so we will filter out any incomplete records here.
 
+### Analysis
 
-## Analysis
-
-The analysis compares each city's mean monthly Kia/Hyundai share of all
-reported vehicle thefts between two periods, split at July 2022 — the month the
-theft technique got popular on social media. The summary statistic is the difference in those means, expressed
-in percentage points.
+I'm comparing each city's mean monthly Kia/Hyundai share before and after July
+2022, the month the theft method got popular on social media. A city needs at
+least 12 months before and 6 after to qualify, so no mean rests on one or two
+observations. The statistic is the gap between those means in percentage points.
 
 ```{r}
 #| label: analysis-a
@@ -274,34 +271,28 @@ theft_tidy |>
   )
 ```
 
-## Conclusions
-
-The tidy dataset holds `r nrow(theft_tidy)` city-months, of which
-`r sum(!is.na(theft_tidy$pct_kia_hyundai))` have both counts reported, leaving
-`r nrow(share_change)` cities with enough coverage to compare periods. The
-largest increase is in `r share_change$city[1]`, where the Kia/Hyundai share of
-reported vehicle thefts rose from
-`r round(share_change$mean_share_pre[1] * 100, 1)`% before July 2022 to
-`r round(share_change$mean_share_post[1] * 100, 1)`% afterward — a gain of
-`r round(share_change$change_pp[1], 1)` percentage points. The median change
-across all `r nrow(share_change)` qualifying cities is
-`r round(median(share_change$change_pp), 1)` percentage points.
-
-@fig-theft-share-a shows the shift is abrupt rather than gradual, with most of
-the rise concentrated in the second half of 2022 and sustained through August
-2023. That pattern is consistent with a known vehicle vulnerability becoming
-widely exploited at a point in time, rather than a slow change in the
-composition of the vehicle fleet, which would produce a gentle trend across the
-whole series.
-
-Two limitations follow from the missing-value decisions above. The comparison
-covers reporting agencies only: `r sum(is.na(theft_tidy$pct_kia_hyundai))`
-city-months lack at least one count and are excluded throughout. And three of
-the 70 geographies are counties rather than cities — Riverside County CA,
-Montgomery County MD and Prince George's County MD — so the units are reporting
-jurisdictions, not a uniform set of municipalities.
-
 ### Conclusions
+
+The tidy dataset holds `r nrow(theft_tidy)` city-months, and
+`r sum(!is.na(theft_tidy$pct_kia_hyundai))` of them report both counts. That
+leaves `r nrow(share_change)` cities with enough coverage to compare periods.
+The biggest jump is `r share_change$city[1]`, where the Kia/Hyundai share went
+from `r round(share_change$mean_share_pre[1] * 100, 1)`% to
+`r round(share_change$mean_share_post[1] * 100, 1)`%, a gain of
+`r round(share_change$change_pp[1], 1)` percentage points. The median change
+across qualifying cities is `r round(median(share_change$change_pp), 1)` points.
+
+@fig-theft-share-a shows the jump is sudden, not gradual. Most of the rise lands
+in the second half of 2022 and holds through August 2023. That looks like a
+vulnerability getting exploited once people knew about it, not a slow shift in
+what cars are on the road, which would trend gently across the whole series.
+
+Two limits on this. `r sum(is.na(theft_tidy$pct_kia_hyundai))` city-months are
+missing at least one count, so I'm only describing agencies that report. And
+three of the 70 locations are counties, not cities — Riverside County CA,
+Montgomery County MD and Prince George's County MD — so these are reporting
+jurisdictions rather than a clean set of municipalities.
+
 
 ## Second Dataset — Medical records
 
@@ -311,17 +302,9 @@ jurisdictions, not a uniform set of municipalities.
 
 - Certain variables, such as Smoker, has inconsistent labeling and will need to be reformatted to one standardized pattern.
 
-## Third Dataset — Highest Grossing Concert Tours by Women
-
-# Dataset B — Patient clinical records
 
 ## Data source
 
-Synthetic patient records distributed as course teaching data: 100 patients
-with demographic, clinical and administrative fields, admitted during calendar
-2023. Committed unmodified to `data/raw/medical_records_raw.csv` and read here
-from its GitHub raw URL. The data is simulated, so results below describe the
-dataset itself and carry no clinical meaning.
 
 ```{r}
 #| label: import-b
@@ -602,22 +585,15 @@ finding) and unrecorded (`r sum(is.na(med$diagnosis))` patients) is preserved
 throughout for the same reason — collapsing them would overstate how many
 patients are known to be disease-free.
 
+## Third Dataset — Highest Grossing Concert Tours by Women
+
 **Challenges**
 
 - Rank 7 appears twice (Celine Dion, Pink) and rank 8 is absent, so the ranking will need to be rearranged for
 
 - The format for the numeric variables will need to be stripped to be solely numbers by removing the dollar signs and commas for more reliable calculations.
 
-## Dataset C — Highest-grossing concert tours
-
-### Data source
-
-Ranked table of the 20 highest-grossing concert tours by female solo artists,
-as published on Wikipedia and compiled from Billboard Boxscore figures.
-Retrieved 2026-10-11, committed unmodified to `data/raw/tours_raw.csv`, and
-read here from its GitHub raw URL. The table carries footnote markers and
-reference numbers from the source page, which are removed during tidying and
-noted where they changed interpretation.
+### Import Data
 
 ```{r}
 #| label: import-c

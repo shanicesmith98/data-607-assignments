@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Shanice Smith">
-<meta name="dcterms.date" content="2026-10-11">
+<meta name="dcterms.date" content="2026-10-12">
 
 <title>Data607_Project2_Codebase</title>
 <style>
@@ -2216,23 +2216,15 @@ vertical-align: -.125em;
   <li><a href="#approach" id="toc-approach" class="nav-link" data-scroll-target="#approach">Approach</a></li>
   <li><a href="#first-dataset-kiahyundai-thefts" id="toc-first-dataset-kiahyundai-thefts" class="nav-link" data-scroll-target="#first-dataset-kiahyundai-thefts">First Dataset — Kia/Hyundai thefts</a>
   <ul class="collapse">
-  <li><a href="#codebase" id="toc-codebase" class="nav-link" data-scroll-target="#codebase">Codebase</a></li>
-  </ul></li>
+  <li><a href="#loading-in-csv" id="toc-loading-in-csv" class="nav-link" data-scroll-target="#loading-in-csv">Loading in CSV</a></li>
   <li><a href="#structure-before-tidying" id="toc-structure-before-tidying" class="nav-link" data-scroll-target="#structure-before-tidying">Structure before tidying</a></li>
-  <li><a href="#transformation" id="toc-transformation" class="nav-link" data-scroll-target="#transformation">Transformation</a>
-  <ul class="collapse">
+  <li><a href="#transformation" id="toc-transformation" class="nav-link" data-scroll-target="#transformation">Transformation</a></li>
   <li><a href="#variable-types-and-naming" id="toc-variable-types-and-naming" class="nav-link" data-scroll-target="#variable-types-and-naming">Variable types and naming</a></li>
   <li><a href="#missing-value-decisions" id="toc-missing-value-decisions" class="nav-link" data-scroll-target="#missing-value-decisions">Missing-value decisions</a></li>
-  </ul></li>
   <li><a href="#analysis" id="toc-analysis" class="nav-link" data-scroll-target="#analysis">Analysis</a></li>
-  <li><a href="#conclusions" id="toc-conclusions" class="nav-link" data-scroll-target="#conclusions">Conclusions</a>
-  <ul class="collapse">
-  <li><a href="#conclusions-1" id="toc-conclusions-1" class="nav-link" data-scroll-target="#conclusions-1">Conclusions</a></li>
+  <li><a href="#conclusions" id="toc-conclusions" class="nav-link" data-scroll-target="#conclusions">Conclusions</a></li>
   </ul></li>
   <li><a href="#second-dataset-medical-records" id="toc-second-dataset-medical-records" class="nav-link" data-scroll-target="#second-dataset-medical-records">Second Dataset — Medical records</a></li>
-  <li><a href="#third-dataset-highest-grossing-concert-tours-by-women" id="toc-third-dataset-highest-grossing-concert-tours-by-women" class="nav-link" data-scroll-target="#third-dataset-highest-grossing-concert-tours-by-women">Third Dataset — Highest Grossing Concert Tours by Women</a></li>
-  <li><a href="#dataset-b-patient-clinical-records" id="toc-dataset-b-patient-clinical-records" class="nav-link" data-scroll-target="#dataset-b-patient-clinical-records">Dataset B — Patient clinical records</a>
-  <ul class="collapse">
   <li><a href="#data-source" id="toc-data-source" class="nav-link" data-scroll-target="#data-source">Data source</a></li>
   <li><a href="#structure-before-tidying-1" id="toc-structure-before-tidying-1" class="nav-link" data-scroll-target="#structure-before-tidying-1">Structure before tidying</a></li>
   <li><a href="#transformation-steps" id="toc-transformation-steps" class="nav-link" data-scroll-target="#transformation-steps">Transformation steps</a>
@@ -2242,11 +2234,11 @@ vertical-align: -.125em;
   <li><a href="#reshaping-the-measurements-to-long-form" id="toc-reshaping-the-measurements-to-long-form" class="nav-link" data-scroll-target="#reshaping-the-measurements-to-long-form">Reshaping the measurements to long form</a></li>
   <li><a href="#missing-value-decisions-1" id="toc-missing-value-decisions-1" class="nav-link" data-scroll-target="#missing-value-decisions-1">Missing-value decisions</a></li>
   <li><a href="#analysis-1" id="toc-analysis-1" class="nav-link" data-scroll-target="#analysis-1">Analysis</a></li>
-  <li><a href="#conclusions-2" id="toc-conclusions-2" class="nav-link" data-scroll-target="#conclusions-2">Conclusions</a></li>
+  <li><a href="#conclusions-1" id="toc-conclusions-1" class="nav-link" data-scroll-target="#conclusions-1">Conclusions</a></li>
   </ul></li>
-  <li><a href="#dataset-c-highest-grossing-concert-tours" id="toc-dataset-c-highest-grossing-concert-tours" class="nav-link" data-scroll-target="#dataset-c-highest-grossing-concert-tours">Dataset C — Highest-grossing concert tours</a>
+  <li><a href="#third-dataset-highest-grossing-concert-tours-by-women" id="toc-third-dataset-highest-grossing-concert-tours-by-women" class="nav-link" data-scroll-target="#third-dataset-highest-grossing-concert-tours-by-women">Third Dataset — Highest Grossing Concert Tours by Women</a>
   <ul class="collapse">
-  <li><a href="#data-source-1" id="toc-data-source-1" class="nav-link" data-scroll-target="#data-source-1">Data source</a></li>
+  <li><a href="#import-data" id="toc-import-data" class="nav-link" data-scroll-target="#import-data">Import Data</a></li>
   <li><a href="#structure-before-tidying-2" id="toc-structure-before-tidying-2" class="nav-link" data-scroll-target="#structure-before-tidying-2">Structure before tidying</a></li>
   <li><a href="#transformation-steps-1" id="toc-transformation-steps-1" class="nav-link" data-scroll-target="#transformation-steps-1">Transformation steps</a></li>
   <li><a href="#capturing-the-footnote-markers-before-deleting-them" id="toc-capturing-the-footnote-markers-before-deleting-them" class="nav-link" data-scroll-target="#capturing-the-footnote-markers-before-deleting-them">Capturing the footnote markers before deleting them</a></li>
@@ -2255,10 +2247,9 @@ vertical-align: -.125em;
   <li><a href="#reshaping-the-two-gross-figures-to-long-form" id="toc-reshaping-the-two-gross-figures-to-long-form" class="nav-link" data-scroll-target="#reshaping-the-two-gross-figures-to-long-form">Reshaping the two gross figures to long form</a></li>
   <li><a href="#why-the-derived-column-is-recomputed" id="toc-why-the-derived-column-is-recomputed" class="nav-link" data-scroll-target="#why-the-derived-column-is-recomputed">Why the derived column is recomputed</a></li>
   <li><a href="#analysis-2" id="toc-analysis-2" class="nav-link" data-scroll-target="#analysis-2">Analysis</a></li>
-  <li><a href="#conclusions-3" id="toc-conclusions-3" class="nav-link" data-scroll-target="#conclusions-3">Conclusions</a></li>
+  <li><a href="#conclusions-2" id="toc-conclusions-2" class="nav-link" data-scroll-target="#conclusions-2">Conclusions</a></li>
   </ul></li>
   <li><a href="#credit" id="toc-credit" class="nav-link" data-scroll-target="#credit">Credit</a></li>
-  </ul></li>
   </ul>
 </nav>
 </div>
@@ -2283,7 +2274,7 @@ vertical-align: -.125em;
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">October 11, 2026</p>
+      <p class="date">October 12, 2026</p>
     </div>
   </div>
   
@@ -2331,10 +2322,8 @@ vertical-align: -.125em;
 <li><p>For the car thefts, I anticipate the blank records being a challenge. The missing theft records from certain locations should not be counted as zeroes, but <code>NA</code>, which I can fix upon import of the file to avoid any complications - <code>na.strings = c(&quot;&quot;, &quot;NA&quot;)</code>.</p></li>
 <li><p>Additionally, there are some inconsistencies of formatting of the locations, such as misspellings and the city/county pattern is not always enforced. Those will have to be fixed with a <code>case_when()</code> to catch before analysis.</p></li>
 </ul>
-<section id="codebase" class="level3">
-<h3 class="anchored" data-anchor-id="codebase">Codebase</h3>
-<section id="loading-in-csv" class="level4">
-<h4 class="anchored" data-anchor-id="loading-in-csv">Loading in CSV</h4>
+<section id="loading-in-csv" class="level3">
+<h3 class="anchored" data-anchor-id="loading-in-csv">Loading in CSV</h3>
 <div class="cell">
 <details open class="code-fold">
 <summary>Code</summary>
@@ -2349,10 +2338,8 @@ vertical-align: -.125em;
 </details>
 </div>
 </section>
-</section>
-</section>
-<section id="structure-before-tidying" class="level2">
-<h2 class="anchored" data-anchor-id="structure-before-tidying">Structure before tidying</h2>
+<section id="structure-before-tidying" class="level3">
+<h3 class="anchored" data-anchor-id="structure-before-tidying">Structure before tidying</h3>
 <div class="cell">
 <details open class="code-fold">
 <summary>Code</summary>
@@ -2404,8 +2391,8 @@ vertical-align: -.125em;
 </div>
 <p>We learn here that the data’s structure is 45 data rows by 211 columns. Column 1 has the month and year from <code>Dec/19</code> through <code>Aug/23</code>.Row 1 is a merged city header (a name followed by two empty cells) and row 2 repeats <code>Kia/Hyundais</code>, <code>All</code>, <code>Percent</code> for each of 70 geographies. City and measure are values stored as column names, so 9,450 observations sit in 210 columns.</p>
 </section>
-<section id="transformation" class="level2">
-<h2 class="anchored" data-anchor-id="transformation">Transformation</h2>
+<section id="transformation" class="level3">
+<h3 class="anchored" data-anchor-id="transformation">Transformation</h3>
 <div class="cell">
 <details open class="code-fold">
 <summary>Code</summary>
@@ -2440,7 +2427,7 @@ vertical-align: -.125em;
 4 &lt;NA&gt;             1</code></pre>
 </div>
 </div>
-<p>Trailing space is seen on several cities, which is why <code>str_trim()</code> is needed. Otherwise, later in the transformation process, two separate columns would be created instead of one.</p>
+<p>Trailing space is seen on several measure labels, which is why <code>str_trim()</code> is needed. Otherwise, later in the transformation process, two separate columns for <code>All</code> would be created instead of one.</p>
 <div class="cell">
 <details open class="code-fold">
 <summary>Code</summary>
@@ -2494,6 +2481,7 @@ vertical-align: -.125em;
 <pre><code>[1] 3150    5</code></pre>
 </div>
 </div>
+</section>
 <section id="variable-types-and-naming" class="level3">
 <h3 class="anchored" data-anchor-id="variable-types-and-naming">Variable types and naming</h3>
 <div class="cell">
@@ -2563,12 +2551,11 @@ $ pct_kia_hyundai    &lt;dbl&gt; 0.07804878, 0.12621359, 0.02195946, NA, 0.05997
 # ℹ 1 more variable: `Neither count` &lt;int&gt;</code></pre>
 </div>
 </div>
-<p>Blank cells are kept as <code>NA</code> and not marked as zero. Some cities, such as Virginia Beach, Norfolk and Miami never report a total theft count; Frisco and Lincoln never report a Kia/Hyundai count; Atlanta, San Antonio and Henderson begin reporting only in January 2021. Treating those blanks as zeros would create problems with our data and analysis, so we will drop any incomplete records from <code>theft_tidy</code> here.</p>
+<p>Blank cells are kept as <code>NA</code> and not marked as zero. Some cities, such as Virginia Beach, Norfolk and Miami never report a total theft count; Frisco and Lincoln never report a Kia/Hyundai count; Atlanta, San Antonio and Henderson begin reporting only in January 2021. Treating those blanks as zeros, which they are not, would create problems with our calculations, so we will filter out any incomplete records here.</p>
 </section>
-</section>
-<section id="analysis" class="level2">
-<h2 class="anchored" data-anchor-id="analysis">Analysis</h2>
-<p>The analysis compares each city’s mean monthly Kia/Hyundai share of all reported vehicle thefts between two periods, split at July 2022 — the month the theft technique got popular on social media. The summary statistic is the difference in those means, expressed in percentage points.</p>
+<section id="analysis" class="level3">
+<h3 class="anchored" data-anchor-id="analysis">Analysis</h3>
+<p>I’m comparing each city’s mean monthly Kia/Hyundai share before and after July 2022, the month the theft method got popular on social media. A city needs at least 12 months before and 6 after to qualify, so no mean rests on one or two observations. The statistic is the gap between those means in percentage points.</p>
 <div class="cell">
 <details open class="code-fold">
 <summary>Code</summary>
@@ -2660,13 +2647,11 @@ Figure 1: Kia/Hyundai share of reported vehicle thefts in the six cities with t
 </div>
 </div>
 </section>
-<section id="conclusions" class="level2">
-<h2 class="anchored" data-anchor-id="conclusions">Conclusions</h2>
-<p>The tidy dataset holds 3150 city-months, of which 2792 have both counts reported, leaving 63 cities with enough coverage to compare periods. The largest increase is in Rochester, NY, where the Kia/Hyundai share of reported vehicle thefts rose from 9.8% before July 2022 to 52.9% afterward — a gain of 43.1 percentage points. The median change across all 63 qualifying cities is 13.5 percentage points.</p>
-<p><a href="#fig-theft-share-a" class="quarto-xref">Figure 1</a> shows the shift is abrupt rather than gradual, with most of the rise concentrated in the second half of 2022 and sustained through August 2023. That pattern is consistent with a known vehicle vulnerability becoming widely exploited at a point in time, rather than a slow change in the composition of the vehicle fleet, which would produce a gentle trend across the whole series.</p>
-<p>Two limitations follow from the missing-value decisions above. The comparison covers reporting agencies only: 358 city-months lack at least one count and are excluded throughout. And three of the 70 geographies are counties rather than cities — Riverside County CA, Montgomery County MD and Prince George’s County MD — so the units are reporting jurisdictions, not a uniform set of municipalities.</p>
-<section id="conclusions-1" class="level3">
-<h3 class="anchored" data-anchor-id="conclusions-1">Conclusions</h3>
+<section id="conclusions" class="level3">
+<h3 class="anchored" data-anchor-id="conclusions">Conclusions</h3>
+<p>The tidy dataset holds 3150 city-months, and 2792 of them report both counts. That leaves 63 cities with enough coverage to compare periods. The biggest jump is Rochester, NY, where the Kia/Hyundai share went from 9.8% to 52.9%, a gain of 43.1 percentage points. The median change across qualifying cities is 13.5 points.</p>
+<p><a href="#fig-theft-share-a" class="quarto-xref">Figure 1</a> shows the jump is sudden, not gradual. Most of the rise lands in the second half of 2022 and holds through August 2023. That looks like a vulnerability getting exploited once people knew about it, not a slow shift in what cars are on the road, which would trend gently across the whole series.</p>
+<p>Two limits on this. 358 city-months are missing at least one count, so I’m only describing agencies that report. And three of the 70 locations are counties, not cities — Riverside County CA, Montgomery County MD and Prince George’s County MD — so these are reporting jurisdictions rather than a clean set of municipalities.</p>
 </section>
 </section>
 <section id="second-dataset-medical-records" class="level2">
@@ -2677,14 +2662,8 @@ Figure 1: Kia/Hyundai share of reported vehicle thefts in the six cities with t
 <li><p>Certain variables, such as Smoker, has inconsistent labeling and will need to be reformatted to one standardized pattern.</p></li>
 </ul>
 </section>
-<section id="third-dataset-highest-grossing-concert-tours-by-women" class="level2">
-<h2 class="anchored" data-anchor-id="third-dataset-highest-grossing-concert-tours-by-women">Third Dataset — Highest Grossing Concert Tours by Women</h2>
-</section>
-<section id="dataset-b-patient-clinical-records" class="level1">
-<h1>Dataset B — Patient clinical records</h1>
 <section id="data-source" class="level2">
 <h2 class="anchored" data-anchor-id="data-source">Data source</h2>
-<p>Synthetic patient records distributed as course teaching data: 100 patients with demographic, clinical and administrative fields, admitted during calendar 2023. Committed unmodified to <code>data/raw/medical_records_raw.csv</code> and read here from its GitHub raw URL. The data is simulated, so results below describe the dataset itself and carry no clinical meaning.</p>
 <div class="cell">
 <details open class="code-fold">
 <summary>Code</summary>
@@ -3079,23 +3058,22 @@ Figure 2: Distribution of each clinical measurement by diagnosis group. Boxes s
 </div>
 </div>
 </section>
-<section id="conclusions-2" class="level3">
-<h3 class="anchored" data-anchor-id="conclusions-2">Conclusions</h3>
+<section id="conclusions-1" class="level3">
+<h3 class="anchored" data-anchor-id="conclusions-1">Conclusions</h3>
 <p>The tidy dataset holds 400 patient-measurement rows, of which 329 carry a reported value and 71 are missing. Of 100 patients, 53 are recorded male, 32 female and 15 unrecorded; smoking status splits 40 / 40 with 20 unrecorded.</p>
 <p>Differences between diagnosis groups are small. Mean age ranges only from 44.4 to 52 years across groups, and mean blood pressure spans under 6 mmHg. <a href="#fig-measures-by-diagnosis-b" class="quarto-xref">Figure 2</a> shows why: each measurement takes only five distinct values — age is recorded in ten-year bands, blood pressure in ten-mmHg steps, cholesterol and BMI in five fixed levels each. The variables are pre-binned, which compresses every group difference toward the bin width and makes correlation or regression inappropriate on these columns.</p>
 <p>The honest conclusion from this dataset is methodological rather than clinical: with discretised measurements, roughly 18% missingness per measurement, and simulated values, the data supports descriptive comparison of group medians and nothing stronger. The <code>Diagnosis</code> column’s distinction between <code>None</code> (27 patients, examined with no finding) and unrecorded (21 patients) is preserved throughout for the same reason — collapsing them would overstate how many patients are known to be disease-free.</p>
+</section>
+</section>
+<section id="third-dataset-highest-grossing-concert-tours-by-women" class="level2">
+<h2 class="anchored" data-anchor-id="third-dataset-highest-grossing-concert-tours-by-women">Third Dataset — Highest Grossing Concert Tours by Women</h2>
 <p><strong>Challenges</strong></p>
 <ul>
 <li><p>Rank 7 appears twice (Celine Dion, Pink) and rank 8 is absent, so the ranking will need to be rearranged for</p></li>
 <li><p>The format for the numeric variables will need to be stripped to be solely numbers by removing the dollar signs and commas for more reliable calculations.</p></li>
 </ul>
-</section>
-</section>
-<section id="dataset-c-highest-grossing-concert-tours" class="level2">
-<h2 class="anchored" data-anchor-id="dataset-c-highest-grossing-concert-tours">Dataset C — Highest-grossing concert tours</h2>
-<section id="data-source-1" class="level3">
-<h3 class="anchored" data-anchor-id="data-source-1">Data source</h3>
-<p>Ranked table of the 20 highest-grossing concert tours by female solo artists, as published on Wikipedia and compiled from Billboard Boxscore figures. Retrieved 2026-10-11, committed unmodified to <code>data/raw/tours_raw.csv</code>, and read here from its GitHub raw URL. The table carries footnote markers and reference numbers from the source page, which are removed during tidying and noted where they changed interpretation.</p>
+<section id="import-data" class="level3">
+<h3 class="anchored" data-anchor-id="import-data">Import Data</h3>
 <div class="cell">
 <details open class="code-fold">
 <summary>Code</summary>
@@ -3437,8 +3415,8 @@ Figure 3: Nominal versus inflation-adjusted gross for each tour, ordered by adj
 </div>
 </div>
 </section>
-<section id="conclusions-3" class="level3">
-<h3 class="anchored" data-anchor-id="conclusions-3">Conclusions</h3>
+<section id="conclusions-2" class="level3">
+<h3 class="anchored" data-anchor-id="conclusions-2">Conclusions</h3>
 <p>The tidy dataset holds 40 rows — 20 tours on two gross bases. Nominal grosses total $5.76 billion against $6.88 billion adjusted to 2022 dollars, a difference of 19% concentrated entirely in the older tours.</p>
 <p>Inflation adjustment reorders the table. <a href="#fig-gross-basis-c" class="quarto-xref">Figure 3</a> shows the two bases diverging as tours get older: recent tours sit as single near-overlapping points, while mid-2000s tours show a wide gap. Cher’s <em>Living Proof: The Farewell Tour</em> climbs from 14th on nominal gross to 10th adjusted, while Pink’s <em>Summer Carnival</em> falls from 8th to 14th — not because it earned less, but because it has no inflation to accumulate and older tours pass it.</p>
 <p>Revenue per show separates two business models that total gross conceals. Taylor Swift’s Eras Tour earned about $13.9M per show across 56 shows, roughly 23 times Cher’s $0.6M per show — yet Cher’s 325-show farewell run still placed 10th on adjusted gross. High-grossing tours reach the top either through stadium economics on a short run or through volume over several years.</p>
@@ -3448,7 +3426,6 @@ Figure 3: Nominal versus inflation-adjusted gross for each tour, ordered by adj
 <section id="credit" class="level2">
 <h2 class="anchored" data-anchor-id="credit">Credit</h2>
 <p>Throughout the assignment, Claude (Opus 5) was used to help plan, explain concepts and debug errors. Anthropic. (2026). Claude (Opus 5) [Large language model].</p>
-</section>
 </section>
 
 </main>
