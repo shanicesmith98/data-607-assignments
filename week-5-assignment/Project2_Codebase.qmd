@@ -8,7 +8,7 @@ format:
     toc-depth: 3
     code-fold: show
     embed-resources: true 
-    df-print: default
+    df-print: kable
 execute:
   warning: false
   message: false
@@ -53,7 +53,11 @@ library(tidyverse)
 
 set.seed(1234)
 
-theme_set(theme_minimal(base_size = 12))   # one visual style across all three figures
+theme_set(
+  theme_minimal(base_size = 12) +
+    theme(axis.text = element_text(color = "grey20"),
+          axis.title = element_text(color = "grey10"))
+)
 
 pct_label <- function(x) ifelse(is.na(x), "", paste0(round(x * 100), "%"))
 ```
@@ -86,8 +90,8 @@ car_theft_data_body <- read_csv(car_thefts_raw_url, col_names = FALSE, skip = 2,
 ```{r}
 #| label: inspect-a
 dim(car_theft_data_body) 
-head(car_theft_header_rows)
-head(car_theft_data_body)
+car_theft_header_rows[, 1:7]    # first two cities' worth of header
+car_theft_data_body[, 1:7]      # first two cities' worth of data
 ```
 
 We learn here that the data's structure is 45 data rows by 211 columns. Column 1 has the month and year from `Dec/19` through `Aug/23`. Row 1 is a merged city header (a name followed by two empty cells) and row 2 repeats `Kia/Hyundais`, `All`, `Percent` for each of 70 geographies. City and measure are values stored as column names, so 9,450 observations sit in 210 columns.
@@ -208,13 +212,7 @@ theft_tidier |>
   )
 ```
 
-Blank cells are kept as `NA` and not marked as zero. Some cities, such as Virginia
-Beach, Norfolk and Miami never report a total theft count; Frisco and Lincoln never
-report a Kia/Hyundai count; Atlanta, San Antonio and Henderson begin reporting only
-in January 2021. Treating those blanks as zeros would invent a denominator and hand
-me a fake 0% share. I'm not dropping the rows here either — the analysis below
-filters incomplete records only where they would break a calculation, so the counts
-above stay auditable.
+Blank cells are kept as `NA` and not marked as zero. Some cities, such as Virginia Beach, Norfolk and Miami never report a total theft count; Frisco and Lincoln never report a Kia/Hyundai count; Atlanta, San Antonio and Henderson begin reporting only in January 2021. Treating those blanks as zeros would invent a denominator and hand me a fake 0% share. I'm not dropping the rows here either — the analysis below filters incomplete records only where they would break a calculation, so the counts above stay auditable.
 
 ### Analysis
 
@@ -248,6 +246,9 @@ share_change |>
     `Change (pct. points)`     = round(change_pp, 1),
     `Months (pre / post)`      = str_c(months_pre, " / ", months_post)
   )
+
+top_cities <- share_change |> slice_max(change_pp, n = 6) |> pull(city)
+
 ```
 
 ```{r}
@@ -256,8 +257,6 @@ share_change |>
 #| fig-alt: "Six small line charts, one per city, each rising sharply after mid-2022."
 #| fig-width: 9
 #| fig-height: 5
-
-top_cities <- share_change |> slice_max(change_pp, n = 6) |> pull(city)
 
 theft_tidier |>
   filter(city %in% top_cities, !is.na(pct_kia_hyundai)) |>
@@ -273,6 +272,21 @@ theft_tidier |>
     y = "Share of all vehicle thefts",
     caption = "Source: Motherboard / VICE News police-record dataset, Dec 2019 - Aug 2023"
   )
+```
+
+```{r}
+#| label: tbl-theft-share-data
+#| tbl-cap: "Monthly Kia/Hyundai share of reported vehicle thefts (%) for the six cities in Figure 1. Blank cells are months the agency did not report."
+
+theft_tidier |>
+  filter(city %in% top_cities) |>
+  mutate(Month = format(month, "%b %Y"),
+         share_pct = round(pct_kia_hyundai * 100, 1)) |>
+  select(Month, month, city, share_pct) |>
+  arrange(month) |>
+  select(-month) |>
+  pivot_wider(names_from = city, values_from = share_pct)
+
 ```
 
 ### Conclusions
@@ -444,6 +458,7 @@ We're doing two comparisons on the long data. First, mean and median of each mea
 
 ```{r}
 #| label: tbl-by-diagnosis-b
+#| tbl-cap: "Mean and median of each clinical measurement by diagnosis group, with the number of patients reporting each measurement. These are the values plotted in Figure 2."
 
 med_summary <- med_tidy |>
   group_by(Measurement = facet_label, Diagnosis = diagnosis_group) |>
@@ -742,7 +757,7 @@ tours_tidy |>
   mutate(tour_title = factor(tour_title, levels = title_order)) |>
   ggplot(aes(x = gross_usd / 1e6, y = tour_title)) +
   geom_line(aes(group = tour_title), color = "grey75", linewidth = 1) +
-  geom_point(aes(color = gross_basis), size = 2.6) +
+  geom_point(aes(color = gross_basis, shape = gross_basis), size = 2.6) +
   scale_x_continuous(labels = function(x) paste0("$", x, "M")) +
   labs(
     x       = "Tour gross",
@@ -751,6 +766,21 @@ tours_tidy |>
     caption = "Source: Wikipedia ranking of highest-grossing female solo tours, compiled from Billboard Boxscore"
   ) +
   theme(legend.position = "top")
+```
+
+```{r}
+#| label: tbl-gross-basis-data
+#| tbl-cap: "Nominal and inflation-adjusted gross for each tour in millions of US dollars, ordered by adjusted gross. These are the values plotted in Figure 3."
+
+tours |>
+  arrange(desc(adjusted_gross)) |>
+  transmute(
+    Artist                = artist,
+    Tour                  = tour_title,
+    `Nominal gross ($M)`  = round(actual_gross   / 1e6, 1),
+    `Adjusted gross ($M)` = round(adjusted_gross / 1e6, 1),
+    `Difference ($M)`     = round((adjusted_gross - actual_gross) / 1e6, 1)
+  )
 ```
 
 ### Conclusions
