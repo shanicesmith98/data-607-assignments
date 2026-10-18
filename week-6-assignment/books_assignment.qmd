@@ -1,0 +1,119 @@
+---
+title: "Data 607 _ HTML & JSON Data Loading of Teen Titans Books"
+author: "Shanice Smith"
+date: today
+format: html
+editor: visual
+---
+
+## Overview
+
+This assignment loads the same book dataset from two hand-generated files — an HTML table (`books.html`) and a JSON array (`books.json`) — into separate R data frames and then verifies that the two frames are identical after normalizing data types.
+
+The dataset covers three graphic novels in the *Teen Titans* series by Kami Garcia and Gabriel Picolo (DC Comics), with ISBN, publication year, and publisher as additional attributes.
+
+## Approach
+
+## Challenges
+
+------------------------------------------------------------------------
+
+## 1 · Load the HTML data
+
+```{r load-html}
+library(rvest)
+
+df_html <- read_html("books.html") |>
+  html_table() |>
+  _[[1]]           # html_table() returns a list; grab the first (only) table
+
+# Trim any stray whitespace that the HTML parser may have captured
+df_html <- as.data.frame(lapply(df_html, trimws))
+
+# Inspect
+str(df_html)
+df_html
+```
+
+> **Note on types:** `html_table()` reads every cell as a character string, so `pub_year` arrives as `"2023"`, `"2024"`, `"2026"` — not integers.
+
+------------------------------------------------------------------------
+
+## 2 · Load the JSON data
+
+```{r load-json}
+library(jsonlite)
+
+df_json <- fromJSON("books.json")
+
+# Inspect
+str(df_json)
+df_json
+```
+
+> **Note on types:** `fromJSON()` auto-detects JSON types, so `pub_year` (stored as a bare integer in the JSON) arrives as an `int` vector, while `isbn` (stored as a quoted string) correctly arrives as `chr`.
+
+------------------------------------------------------------------------
+
+## 3 · Reconcile types before comparing
+
+Because the HTML parser returns everything as `character` while `fromJSON` preserves native JSON types, a direct `identical()` call would return `FALSE` due to the `pub_year` type mismatch — even though the values are logically the same. We coerce both frames to character to create a fair comparison.
+
+```{r normalize}
+# Coerce all columns to character in both frames so types align
+df_html_norm <- as.data.frame(lapply(df_html, as.character),
+                              stringsAsFactors = FALSE)
+
+df_json_norm <- as.data.frame(lapply(df_json, as.character),
+                              stringsAsFactors = FALSE)
+
+# Guarantee identical column order (JSON key order may differ from HTML column order)
+df_json_norm <- df_json_norm[, names(df_html_norm)]
+```
+
+------------------------------------------------------------------------
+
+## 4 · Compare the two data frames
+
+```{r compare}
+are_identical <- identical(df_html_norm, df_json_norm)
+
+cat("Are the two data frames identical?", are_identical, "\n")
+
+# Detailed diff: show any cells that don't match
+if (!are_identical) {
+  mismatches <- which(df_html_norm != df_json_norm, arr.ind = TRUE)
+  cat("Mismatches found at (row, col):\n")
+  print(mismatches)
+  cat("\nHTML values at mismatch positions:\n")
+  print(df_html_norm[mismatches])
+  cat("\nJSON values at mismatch positions:\n")
+  print(df_json_norm[mismatches])
+} else {
+  cat("Both data frames contain exactly the same data.\n")
+}
+```
+
+------------------------------------------------------------------------
+
+## 5 · Side-by-side view
+
+```{r side-by-side}
+cat("--- HTML data frame ---\n")
+print(df_html_norm)
+
+cat("\n--- JSON data frame ---\n")
+print(df_json_norm)
+```
+
+------------------------------------------------------------------------
+
+## Summary
+
+| Step | Key point |
+|--------------------------|----------------------------------------------|
+| HTML → R | `rvest::html_table()` returns all values as `character`; trim whitespace |
+| JSON → R | `jsonlite::fromJSON()` preserves native types (`int`, `chr`, etc.) |
+| Type challenge | `pub_year` is `int` from JSON but `chr` from HTML; coerce before comparing |
+| ISBN safety | Storing ISBN as a quoted string in JSON prevents 13-digit integer precision loss |
+| Result | After normalization, `identical()` returns `TRUE` |
