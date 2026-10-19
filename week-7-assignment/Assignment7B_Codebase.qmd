@@ -1,0 +1,162 @@
+---
+title: "Data 607 - HTML & JSON Data Loading of Teen Titans Books"
+author: "Shanice Smith"
+date: today
+format: html
+editor: visual
+---
+
+## Overview
+
+This assignment loads the same book dataset from two hand-generated files — an HTML table (`books.html`) and a JSON array (`books.json`) — into separate R data frames and then verifies that the two frames are identical after normalizing data types.
+
+The dataset covers three graphic novels in the *Teen Titans* series by Kami Garcia and Gabriel Picolo (DC Comics), with ISBN, publication year, and publisher as additional attributes.
+
+## Approach
+
+**Step 1 — Gather book data.** Confirm accurate title, authors, ISBN, publication year, and publisher for all three books. The series (Garcia/Picolo, DC Comics) makes the publisher uniform, which simplifies entry but also means a typo would propagate unnoticed — double-check ISBNs especially, since they are the most error-prone field.
+
+**Step 2 — Create `books.html` by hand.** Write a standard HTML `<table>` with a `<thead>` row for column names and three `<tbody>` rows for the books. Column names must exactly match the JSON keys that come next (same spelling and case), or the comparison step will fail.
+
+**Step 3 — Create `books.json` by hand.** Write a JSON array of three objects, one per book, using the same field names as the HTML headers. Represent `isbn` as a quoted string to avoid 13-digit integer precision loss. Represent `pub_year` as an unquoted integer (standard JSON) — this is the main type-mismatch challenge to manage downstream.
+
+**Step 4 — Load HTML into R.** Use `rvest::read_html()` + `html_table()`. The parser returns all values as character strings. Trim whitespace; `rvest` may pad cells.
+
+**Step 5 — Load JSON into R.** Use `jsonlite::fromJSON()`. This auto-detects types, so `pub_year` arrives as integer while it’s character from HTML. **Data challenge:** types must be reconciled before `identical()` will return `TRUE`.
+
+**Step 6 — Normalize and compare.** Coerce `pub_year` to character in both frames (or integer in both), align column order, and then run `identical()`. A failed identity check should print a diagnostic diff, not just `FALSE`.
+
+## Challenges
+
+- Types **—**
+
+------------------------------------------------------------------------
+
+## 1 · Load the HTML data
+
+`httr::GET()` fetches the raw file from GitHub and `httr::content()` extracts the text, which is then handed to `rvest::read_html()`. The files must be pushed to GitHub first; the URL must point to `raw.githubusercontent.com`, not the regular `github.com` page (which would return GitHub's surrounding HTML instead of the file itself).
+
+```{r load-html}
+library(httr)
+library(rvest)
+library(stringr)
+library(rjson)
+
+# Replace with your GitHub username, repo name, and branch
+github_base <- "https://raw.githubusercontent.com/shanicesmith98/data-607-assignments/refs/heads/main/week-7-assignment/"
+
+html_response <- tryCatch(
+  {
+    response <- GET(paste0(github_base, "/books.html"))
+    stop_for_status(response)
+    response
+  },
+  error = function(e) {
+    stop("Failed to fetch books.html — check the URL and that the repo is public.\n",
+         "Details: ", conditionMessage(e))
+  }
+)
+
+html_text     <- content(html_response, as = "text", encoding = "UTF-8")
+
+df_html <- read_html(html_text) |>
+  html_table() |>
+  _[[1]]                   # html_table() returns a list; extract the first table
+
+# Use stringr::str_trim() to remove any leading/trailing whitespace the
+# HTML parser may have captured around cell values
+df_html <- as.data.frame(
+  lapply(df_html, str_trim),
+  stringsAsFactors = FALSE
+)
+
+str(df_html)
+df_html
+```
+
+## 2 · Load the JSON data
+
+The same `httr::GET()` / `content()` pattern fetches the JSON file from GitHub. `rjson::fromJSON()` then parses that text into a nested R list — one element per book — which is coerced into a data frame with `as.data.frame()`.
+
+```{r load-json}
+json_response <- tryCatch(
+  {
+    res <- GET(paste0(github_base, "/books.json"))
+    stop_for_status(res)
+    res
+  },
+  error = function(e) {
+    stop("Failed to fetch books.json — check the URL and that the repo is public.\n",
+         "Details: ", conditionMessage(e))
+  }
+)
+
+json_text     <- content(json_response, as = "text", encoding = "UTF-8")
+
+# rjson::fromJSON() returns a list of lists, not a data frame directly.
+# do.call(rbind, ...) binds the per-book lists into a matrix, and
+# as.data.frame() converts that into a proper data frame.
+df_json <- as.data.frame(
+  do.call(rbind, rjson::fromJSON(json_text)),
+  stringsAsFactors = FALSE
+)
+
+# do.call(rbind) produces list-columns; unlist each column to atomic vectors,
+# then apply str_trim() to normalize whitespace and types in one pass
+df_json <- as.data.frame(
+  lapply(df_json, function(x) str_trim(as.character(unlist(x)))),
+  stringsAsFactors = FALSE
+)
+
+str(df_json)
+df_json
+```
+
+> **Note on types:** Unlike `jsonlite`, `rjson::fromJSON()` returns a plain R list rather than a data frame, so the `do.call(rbind, ...)` + `as.data.frame()` conversion is required. The `unlist()` call inside `lapply` flattens the resulting list-columns into atomic vectors before `as.character()` and `str_trim()` normalize everything to clean character strings.
+
+------------------------------------------------------------------------
+
+## 3 · Align column order, then compare
+
+`identical()` is sensitive to column order. Reordering `df_json` to match `df_html` ensures a structural match before the value comparison.
+
+```{r compare}
+# Guarantee column order matches
+df_json <- df_json[, names(df_html)]
+
+are_identical <- identical(df_html, df_json)
+cat("Are the two data frames identical?", are_identical, "\n")
+
+# Diagnostic: surface any cell-level differences if the check fails
+if (!are_identical) {
+  mismatches <- which(df_html != df_json, arr.ind = TRUE)
+  cat("\nMismatches (row, col):\n")
+  print(mismatches)
+  cat("\nHTML values:\n");  print(df_html[mismatches])
+  cat("\nJSON values:\n");  print(df_json[mismatches])
+} else {
+  cat("Both data frames contain exactly the same data.\n")
+}
+```
+
+------------------------------------------------------------------------
+
+## 4 · Side-by-side view
+
+```{r side-by-side}
+cat("--- HTML data frame ---\n");  print(df_html)
+cat("\n--- JSON data frame ---\n"); print(df_json)
+```
+
+------------------------------------------------------------------------
+
+## Summary
+
+| Step | Package | Key point |
+|------------------|-------------------------|-----------------------------|
+| Fetch HTML | `httr` | `GET()` on the raw GitHub URL; `content(as="text")` extracts the file text |
+| Parse HTML | `rvest` | `read_html()` + `html_table()` extracts the table; all values are `character` |
+| Fetch JSON | `httr` | Same `GET()` pattern on the raw GitHub URL; `content()` returns the JSON string |
+| Parse JSON | `rjson` | `fromJSON()` returns a list of lists; `do.call(rbind, ...)` + `unlist()` coerces it into a data frame |
+| Clean strings | `stringr` | `str_trim()` removes whitespace; `as.character()` + `str_trim()` normalizes types and whitespace in one pass |
+| Compare | base R | `identical()` returns `TRUE` after type and column-order alignment |
