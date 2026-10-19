@@ -121,22 +121,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="overview" class="level2">
 <h2 class="anchored" data-anchor-id="overview">Overview</h2>
 <p>This assignment loads the same book dataset from two hand-generated files — an HTML table (<code>books.html</code>) and a JSON array (<code>books.json</code>) — into separate R data frames and then verifies that the two frames are identical after normalizing data types.</p>
-<p>The dataset covers three graphic novels in the <em>Teen Titans</em> series by Kami Garcia and Gabriel Picolo (DC Comics), with ISBN, publication year, and publisher as additional attributes.</p>
+<p>The dataset covers three graphic novels in the <em>Teen Titans</em> series by Kami Garcia and Gabriel Picolo (DC Comics), with ISBN, publication year, and publisher as additional attributes. I was particularly interested in the series after attending a panel session with the authors last weekend at Comic Con, and now inspired to begin reading the books.</p>
 </section>
 <section id="approach" class="level2">
 <h2 class="anchored" data-anchor-id="approach">Approach</h2>
-<p><strong>Step 1 — Gather book data.</strong> Confirm accurate title, authors, ISBN, publication year, and publisher for all three books. The series (Garcia/Picolo, DC Comics) makes the publisher uniform, which simplifies entry but also means a typo would propagate unnoticed — double-check ISBNs especially, since they are the most error-prone field.</p>
-<p><strong>Step 2 — Create <code>books.html</code> by hand.</strong> Write a standard HTML <code>&lt;table&gt;</code> with a <code>&lt;thead&gt;</code> row for column names and three <code>&lt;tbody&gt;</code> rows for the books. Column names must exactly match the JSON keys that come next (same spelling and case), or the comparison step will fail.</p>
-<p><strong>Step 3 — Create <code>books.json</code> by hand.</strong> Write a JSON array of three objects, one per book, using the same field names as the HTML headers. Represent <code>isbn</code> as a quoted string to avoid 13-digit integer precision loss. Represent <code>pub_year</code> as an unquoted integer (standard JSON) — this is the main type-mismatch challenge to manage downstream.</p>
-<p><strong>Step 4 — Load HTML into R.</strong> Use <code>rvest::read_html()</code> + <code>html_table()</code>. The parser returns all values as character strings. Trim whitespace; <code>rvest</code> may pad cells.</p>
-<p><strong>Step 5 — Load JSON into R.</strong> Use <code>jsonlite::fromJSON()</code>. This auto-detects types, so <code>pub_year</code> arrives as integer while it’s character from HTML. <strong>Data challenge:</strong> types must be reconciled before <code>identical()</code> will return <code>TRUE</code>.</p>
-<p><strong>Step 6 — Normalize and compare.</strong> Coerce <code>pub_year</code> to character in both frames (or integer in both), align column order, and then run <code>identical()</code>. A failed identity check should print a diagnostic diff, not just <code>FALSE</code>.</p>
-</section>
-<section id="challenges" class="level2">
-<h2 class="anchored" data-anchor-id="challenges">Challenges</h2>
-<ul>
-<li>Types <strong>—</strong></li>
-</ul>
+<p><strong>Step 1 — Gather book data.</strong></p>
+<p><strong>Step 2 — Create <code>books.html</code> by hand.</strong></p>
+<p><strong>Step 3 — Create <code>books.json</code> by hand.</strong></p>
+<p><strong>Step 4 — Load HTML into R.</strong></p>
+<p><strong>Step 5 — Load JSON into R.</strong></p>
+<p><strong>Step 6 — Normalize and compare.</strong></p>
 <hr>
 </section>
 <section id="load-the-html-data" class="level2">
@@ -149,7 +143,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rjson)</span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Replace with your GitHub username, repo name, and branch</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>github_base <span class="ot">&lt;-</span> <span class="st">"https://raw.githubusercontent.com/shanicesmith98/data-607-assignments/refs/heads/main/week-6-assignment/"</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>github_base <span class="ot">&lt;-</span> <span class="st">"https://raw.githubusercontent.com/shanicesmith98/data-607-assignments/refs/heads/main/week-7-assignment/"</span></span>
 <span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>html_response <span class="ot">&lt;-</span> <span class="fu">tryCatch</span>(</span>
 <span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>  {</span>
@@ -320,54 +314,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <hr>
 </section>
-<section id="summary" class="level2">
-<h2 class="anchored" data-anchor-id="summary">Summary</h2>
-<table class="caption-top table">
-<colgroup>
-<col style="width: 25%">
-<col style="width: 34%">
-<col style="width: 40%">
-</colgroup>
-<thead>
-<tr class="header">
-<th>Step</th>
-<th>Package</th>
-<th>Key point</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>Fetch HTML</td>
-<td><code>httr</code></td>
-<td><code>GET()</code> on the raw GitHub URL; <code>content(as="text")</code> extracts the file text</td>
-</tr>
-<tr class="even">
-<td>Parse HTML</td>
-<td><code>rvest</code></td>
-<td><code>read_html()</code> + <code>html_table()</code> extracts the table; all values are <code>character</code></td>
-</tr>
-<tr class="odd">
-<td>Fetch JSON</td>
-<td><code>httr</code></td>
-<td>Same <code>GET()</code> pattern on the raw GitHub URL; <code>content()</code> returns the JSON string</td>
-</tr>
-<tr class="even">
-<td>Parse JSON</td>
-<td><code>rjson</code></td>
-<td><code>fromJSON()</code> returns a list of lists; <code>do.call(rbind, ...)</code> + <code>unlist()</code> coerces it into a data frame</td>
-</tr>
-<tr class="odd">
-<td>Clean strings</td>
-<td><code>stringr</code></td>
-<td><code>str_trim()</code> removes whitespace; <code>as.character()</code> + <code>str_trim()</code> normalizes types and whitespace in one pass</td>
-</tr>
-<tr class="even">
-<td>Compare</td>
-<td>base R</td>
-<td><code>identical()</code> returns <code>TRUE</code> after type and column-order alignment</td>
-</tr>
-</tbody>
-</table>
+<section id="credit" class="level2">
+<h2 class="anchored" data-anchor-id="credit">Credit</h2>
+<p>Throughout the assignment, Claude (Opus 5) was used to help plan, explain concepts, flag data issues, and debug errors.</p>
+<p>Anthropic. (2026). Claude (Opus 5) [Large language model].</p>
 </section>
 
 </main>

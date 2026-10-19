@@ -10,25 +10,21 @@ editor: visual
 
 This assignment loads the same book dataset from two hand-generated files — an HTML table (`books.html`) and a JSON array (`books.json`) — into separate R data frames and then verifies that the two frames are identical after normalizing data types.
 
-The dataset covers three graphic novels in the *Teen Titans* series by Kami Garcia and Gabriel Picolo (DC Comics), with ISBN, publication year, and publisher as additional attributes.
+The dataset covers three graphic novels in the *Teen Titans* series by Kami Garcia and Gabriel Picolo (DC Comics), with ISBN, publication year, and publisher as additional attributes. I was particularly interested in the series after attending a panel session with the authors last weekend at Comic Con, and now inspired to begin reading the books.
 
 ## Approach
 
-**Step 1 — Gather book data.** Confirm accurate title, authors, ISBN, publication year, and publisher for all three books. The series (Garcia/Picolo, DC Comics) makes the publisher uniform, which simplifies entry but also means a typo would propagate unnoticed — double-check ISBNs especially, since they are the most error-prone field.
+**Step 1 — Gather book data.**
 
-**Step 2 — Create `books.html` by hand.** Write a standard HTML `<table>` with a `<thead>` row for column names and three `<tbody>` rows for the books. Column names must exactly match the JSON keys that come next (same spelling and case), or the comparison step will fail.
+**Step 2 — Create `books.html` by hand.**
 
-**Step 3 — Create `books.json` by hand.** Write a JSON array of three objects, one per book, using the same field names as the HTML headers. Represent `isbn` as a quoted string to avoid 13-digit integer precision loss. Represent `pub_year` as an unquoted integer (standard JSON) — this is the main type-mismatch challenge to manage downstream.
+**Step 3 — Create `books.json` by hand.**
 
-**Step 4 — Load HTML into R.** Use `rvest::read_html()` + `html_table()`. The parser returns all values as character strings. Trim whitespace; `rvest` may pad cells.
+**Step 4 — Load HTML into R.**
 
-**Step 5 — Load JSON into R.** Use `jsonlite::fromJSON()`. This auto-detects types, so `pub_year` arrives as integer while it’s character from HTML. **Data challenge:** types must be reconciled before `identical()` will return `TRUE`.
+**Step 5 — Load JSON into R.**
 
-**Step 6 — Normalize and compare.** Coerce `pub_year` to character in both frames (or integer in both), align column order, and then run `identical()`. A failed identity check should print a diagnostic diff, not just `FALSE`.
-
-## Challenges
-
-- Types **—**
+**Step 6 — Normalize and compare.**
 
 ------------------------------------------------------------------------
 
@@ -150,13 +146,8 @@ cat("\n--- JSON data frame ---\n"); print(df_json)
 
 ------------------------------------------------------------------------
 
-## Summary
+## Credit
 
-| Step | Package | Key point |
-|------------------|-------------------------|-----------------------------|
-| Fetch HTML | `httr` | `GET()` on the raw GitHub URL; `content(as="text")` extracts the file text |
-| Parse HTML | `rvest` | `read_html()` + `html_table()` extracts the table; all values are `character` |
-| Fetch JSON | `httr` | Same `GET()` pattern on the raw GitHub URL; `content()` returns the JSON string |
-| Parse JSON | `rjson` | `fromJSON()` returns a list of lists; `do.call(rbind, ...)` + `unlist()` coerces it into a data frame |
-| Clean strings | `stringr` | `str_trim()` removes whitespace; `as.character()` + `str_trim()` normalizes types and whitespace in one pass |
-| Compare | base R | `identical()` returns `TRUE` after type and column-order alignment |
+Throughout the assignment, Claude (Opus 5) was used to help plan, explain concepts, flag data issues, and debug errors.
+
+Anthropic. (2026). Claude (Opus 5) \[Large language model\].
