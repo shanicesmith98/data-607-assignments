@@ -1,19 +1,19 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 
-<meta charset="utf-8">
-<meta name="generator" content="quarto-1.10.18">
+<head>
 
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<meta charset="utf-8" />
+<meta name="generator" content="quarto-1.10.18" />
 
-<meta name="author" content="Shanice Smith">
-<meta name="dcterms.date" content="2026-10-18">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+
+<meta name="author" content="Shanice Smith" />
+<meta name="dcterms.date" content="2026-10-19" />
 
 <title>Data 607 - HTML &amp; JSON Data Loading of Teen Titans Books</title>
 <style>
-/* Default styles provided by pandoc.
-** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
-*/
+
 span.smallcaps{font-variant: small-caps;}
 div.columns{display: flex; gap: 1.5em;}
 div.column{flex: auto;}
@@ -24,11 +24,10 @@ div.column{overflow-x: auto;}
 div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
 ul.task-list{list-style: none;}
 ul.task-list li input[type="checkbox"] {
-  width: 0.8em;
-  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
-  vertical-align: middle;
+width: 0.8em;
+margin: 0 0.8em 0.2em -1em;  vertical-align: middle;
 }
-/* CSS for syntax highlighting */
+
 html { -webkit-text-size-adjust: 100%; }
 pre > code.sourceCode { white-space: pre; position: relative; }
 pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
@@ -45,46 +44,36 @@ pre > code.sourceCode { white-space: pre-wrap; }
 pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
 }
 pre.numberSource code
-  { counter-reset: source-line 0; }
+{ counter-reset: source-line 0; }
 pre.numberSource code > span
-  { position: relative; left: -4em; counter-increment: source-line; }
+{ position: relative; left: -4em; counter-increment: source-line; }
 pre.numberSource code > span > a:first-child::before
-  { content: counter(source-line);
-    position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; display: inline-block;
-    -webkit-touch-callout: none; -webkit-user-select: none;
-    -khtml-user-select: none; -moz-user-select: none;
-    -ms-user-select: none; user-select: none;
-    padding: 0 4px; width: 4em;
-  }
-pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+}
+pre.numberSource { margin-left: 3em; padding-left: 4px; }
 div.sourceCode
-  {   }
+{ }
 @media screen {
 pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 </style>
 
-
-<script src="Assignment7B_Codebase_files/libs/clipboard/clipboard.min.js"></script>
-<script src="Assignment7B_Codebase_files/libs/quarto-html/quarto.js" type="module"></script>
-<script src="Assignment7B_Codebase_files/libs/quarto-html/tabsets/tabsets.js" type="module"></script>
-<script src="Assignment7B_Codebase_files/libs/quarto-html/popper.min.js"></script>
-<script src="Assignment7B_Codebase_files/libs/quarto-html/tippy.umd.min.js"></script>
-<script src="Assignment7B_Codebase_files/libs/quarto-html/anchor.min.js"></script>
-<link href="Assignment7B_Codebase_files/libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="Assignment7B_Codebase_files/libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
-<script src="Assignment7B_Codebase_files/libs/bootstrap/bootstrap.min.js"></script>
-<link href="Assignment7B_Codebase_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="Assignment7B_Codebase_files/libs/bootstrap/bootstrap-917079515d91bccb85b543faf8aa8bb6.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<!-- htmldependencies:E3FAD763 -->
 
 
 </head>
 
-<body class="fullcontent quarto-light">
+<body>
 
 <div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
-
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+</div>
 <main class="content" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
@@ -106,7 +95,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">October 18, 2026</p>
+      <p class="date">October 19, 2026</p>
     </div>
   </div>
   
@@ -119,67 +108,66 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 <section id="overview" class="level2">
-<h2 class="anchored" data-anchor-id="overview">Overview</h2>
+<h2>Overview</h2>
 <p>This assignment loads the same book dataset from two hand-generated files — an HTML table (<code>books.html</code>) and a JSON array (<code>books.json</code>) — into separate R data frames and then verifies that the two frames are identical after normalizing data types.</p>
 <p>The dataset covers three graphic novels in the <em>Teen Titans</em> series by Kami Garcia and Gabriel Picolo (DC Comics), with ISBN, publication year, and publisher as additional attributes. I was particularly interested in the series after attending a panel session with the authors last weekend at Comic Con, and now inspired to begin reading the books.</p>
 </section>
 <section id="approach" class="level2">
-<h2 class="anchored" data-anchor-id="approach">Approach</h2>
+<h2>Approach</h2>
 <p><strong>Step 1 — Gather book data.</strong></p>
 <p><strong>Step 2 — Create <code>books.html</code> by hand.</strong></p>
 <p><strong>Step 3 — Create <code>books.json</code> by hand.</strong></p>
 <p><strong>Step 4 — Load HTML into R.</strong></p>
 <p><strong>Step 5 — Load JSON into R.</strong></p>
 <p><strong>Step 6 — Normalize and compare.</strong></p>
-<hr>
+<hr />
 </section>
 <section id="load-the-html-data" class="level2">
-<h2 class="anchored" data-anchor-id="load-the-html-data">1 · Load the HTML data</h2>
-<p><code>httr::GET()</code> fetches the raw file from GitHub and <code>httr::content()</code> extracts the text, which is then handed to <code>rvest::read_html()</code>. The files must be pushed to GitHub first; the URL must point to <code>raw.githubusercontent.com</code>, not the regular <code>github.com</code> page (which would return GitHub’s surrounding HTML instead of the file itself).</p>
+<h2>1 · Load the HTML data</h2>
+<p><code>httr::GET()</code> fetches the raw file from GitHub and <code>httr::content()</code> extracts the text, which is then handed to <code>rvest::read_html()</code>.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(httr)</span>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r cell-code"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(httr)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rvest)</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(stringr)</span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rjson)</span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Replace with your GitHub username, repo name, and branch</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>github_base <span class="ot">&lt;-</span> <span class="st">"https://raw.githubusercontent.com/shanicesmith98/data-607-assignments/refs/heads/main/week-7-assignment/"</span></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>html_response <span class="ot">&lt;-</span> <span class="fu">tryCatch</span>(</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>  {</span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    response <span class="ot">&lt;-</span> <span class="fu">GET</span>(<span class="fu">paste0</span>(github_base, <span class="st">"/books.html"</span>))</span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">stop_for_status</span>(response)</span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    response</span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>  },</span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">error =</span> <span class="cf">function</span>(e) {</span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>    <span class="fu">stop</span>(<span class="st">"Failed to fetch books.html — check the URL and that the repo is public.</span><span class="sc">\n</span><span class="st">"</span>,</span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>         <span class="st">"Details: "</span>, <span class="fu">conditionMessage</span>(e))</span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>html_text     <span class="ot">&lt;-</span> <span class="fu">content</span>(html_response, <span class="at">as =</span> <span class="st">"text"</span>, <span class="at">encoding =</span> <span class="st">"UTF-8"</span>)</span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>df_html <span class="ot">&lt;-</span> <span class="fu">read_html</span>(html_text) <span class="sc">|&gt;</span></span>
-<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">html_table</span>() <span class="sc">|&gt;</span></span>
-<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>  _[[<span class="dv">1</span>]]                   <span class="co"># html_table() returns a list; extract the first table</span></span>
-<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a><span class="co"># Use stringr::str_trim() to remove any leading/trailing whitespace the</span></span>
-<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a><span class="co"># HTML parser may have captured around cell values</span></span>
-<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>df_html <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(</span>
-<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">lapply</span>(df_html, str_trim),</span>
-<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>  <span class="at">stringsAsFactors =</span> <span class="cn">FALSE</span></span>
-<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(df_html)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>github_base <span class="ot">&lt;-</span> <span class="st">&quot;https://raw.githubusercontent.com/shanicesmith98/data-607-assignments/refs/heads/main/week-7-assignment/&quot;</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>html_response <span class="ot">&lt;-</span> <span class="fu">tryCatch</span>(</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>  {</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    response <span class="ot">&lt;-</span> <span class="fu">GET</span>(<span class="fu">paste0</span>(github_base, <span class="st">&quot;/books.html&quot;</span>))</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">stop_for_status</span>(response)</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    response</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>  },</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">error =</span> <span class="cf">function</span>(e) {</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>    <span class="fu">stop</span>(<span class="st">&quot;Failed to fetch books.html — check the URL and that the repo is public.</span><span class="sc">\n</span><span class="st">&quot;</span>,</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>         <span class="st">&quot;Details: &quot;</span>, <span class="fu">conditionMessage</span>(e))</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>html_text     <span class="ot">&lt;-</span> <span class="fu">content</span>(html_response, <span class="at">as =</span> <span class="st">&quot;text&quot;</span>, <span class="at">encoding =</span> <span class="st">&quot;UTF-8&quot;</span>)</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>df_html <span class="ot">&lt;-</span> <span class="fu">read_html</span>(html_text) <span class="sc">|&gt;</span></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">html_table</span>() <span class="sc">|&gt;</span></span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>  _[[<span class="dv">1</span>]]                   <span class="co"># html_table() returns a list; extract the first table</span></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a><span class="co"># Use stringr::str_trim() to remove any leading/trailing whitespace the</span></span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a><span class="co"># HTML parser may have captured around cell values</span></span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>df_html <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(</span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">lapply</span>(df_html, str_trim),</span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>  <span class="at">stringsAsFactors =</span> <span class="cn">FALSE</span></span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(df_html)</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>'data.frame':   3 obs. of  5 variables:
- $ title    : chr  "Teen Titans: Robin" "Teen Titans: Starfire" "Teen Titans: Together"
- $ authors  : chr  "Kami Garcia, Gabriel Picolo" "Kami Garcia, Gabriel Picolo" "Kami Garcia, Gabriel Picolo"
- $ isbn     : chr  "9781779512246" "9781779517999" "9781799503064"
- $ pub_year : chr  "2023" "2024" "2026"
- $ publisher: chr  "DC Comics" "DC Comics" "DC Comics"</code></pre>
+<pre><code>&#39;data.frame&#39;:   3 obs. of  5 variables:
+ $ title    : chr  &quot;Teen Titans: Robin&quot; &quot;Teen Titans: Starfire&quot; &quot;Teen Titans: Together&quot;
+ $ authors  : chr  &quot;Kami Garcia, Gabriel Picolo&quot; &quot;Kami Garcia, Gabriel Picolo&quot; &quot;Kami Garcia, Gabriel Picolo&quot;
+ $ isbn     : chr  &quot;9781779512246&quot; &quot;9781779517999&quot; &quot;9781799503064&quot;
+ $ pub_year : chr  &quot;2023&quot; &quot;2024&quot; &quot;2026&quot;
+ $ publisher: chr  &quot;DC Comics&quot; &quot;DC Comics&quot; &quot;DC Comics&quot;</code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>df_html</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r cell-code"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>df_html</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>                  title                     authors          isbn pub_year
 1    Teen Titans: Robin Kami Garcia, Gabriel Picolo 9781779512246     2023
@@ -193,22 +181,22 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </section>
 <section id="load-the-json-data" class="level2">
-<h2 class="anchored" data-anchor-id="load-the-json-data">2 · Load the JSON data</h2>
+<h2>2 · Load the JSON data</h2>
 <p>The same <code>httr::GET()</code> / <code>content()</code> pattern fetches the JSON file from GitHub. <code>rjson::fromJSON()</code> then parses that text into a nested R list — one element per book — which is coerced into a data frame with <code>as.data.frame()</code>.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>json_response <span class="ot">&lt;-</span> <span class="fu">tryCatch</span>(</span>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r cell-code"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>json_response <span class="ot">&lt;-</span> <span class="fu">tryCatch</span>(</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  {</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    res <span class="ot">&lt;-</span> <span class="fu">GET</span>(<span class="fu">paste0</span>(github_base, <span class="st">"/books.json"</span>))</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    res <span class="ot">&lt;-</span> <span class="fu">GET</span>(<span class="fu">paste0</span>(github_base, <span class="st">&quot;/books.json&quot;</span>))</span>
 <span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">stop_for_status</span>(res)</span>
 <span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    res</span>
 <span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  },</span>
 <span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">error =</span> <span class="cf">function</span>(e) {</span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">stop</span>(<span class="st">"Failed to fetch books.json — check the URL and that the repo is public.</span><span class="sc">\n</span><span class="st">"</span>,</span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>         <span class="st">"Details: "</span>, <span class="fu">conditionMessage</span>(e))</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">stop</span>(<span class="st">&quot;Failed to fetch books.json — check the URL and that the repo is public.</span><span class="sc">\n</span><span class="st">&quot;</span>,</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>         <span class="st">&quot;Details: &quot;</span>, <span class="fu">conditionMessage</span>(e))</span>
 <span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>  }</span>
 <span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>json_text     <span class="ot">&lt;-</span> <span class="fu">content</span>(json_response, <span class="at">as =</span> <span class="st">"text"</span>, <span class="at">encoding =</span> <span class="st">"UTF-8"</span>)</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>json_text     <span class="ot">&lt;-</span> <span class="fu">content</span>(json_response, <span class="at">as =</span> <span class="st">&quot;text&quot;</span>, <span class="at">encoding =</span> <span class="st">&quot;UTF-8&quot;</span>)</span>
 <span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a><span class="co"># rjson::fromJSON() returns a list of lists, not a data frame directly.</span></span>
 <span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a><span class="co"># do.call(rbind, ...) binds the per-book lists into a matrix, and</span></span>
@@ -225,16 +213,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>  <span class="at">stringsAsFactors =</span> <span class="cn">FALSE</span></span>
 <span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(df_json)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(df_json)</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>'data.frame':   3 obs. of  5 variables:
- $ title    : chr  "Teen Titans: Robin" "Teen Titans: Starfire" "Teen Titans: Together"
- $ authors  : chr  "Kami Garcia, Gabriel Picolo" "Kami Garcia, Gabriel Picolo" "Kami Garcia, Gabriel Picolo"
- $ isbn     : chr  "9781779512246" "9781779517999" "9781799503064"
- $ pub_year : chr  "2023" "2024" "2026"
- $ publisher: chr  "DC Comics" "DC Comics" "DC Comics"</code></pre>
+<pre><code>&#39;data.frame&#39;:   3 obs. of  5 variables:
+ $ title    : chr  &quot;Teen Titans: Robin&quot; &quot;Teen Titans: Starfire&quot; &quot;Teen Titans: Together&quot;
+ $ authors  : chr  &quot;Kami Garcia, Gabriel Picolo&quot; &quot;Kami Garcia, Gabriel Picolo&quot; &quot;Kami Garcia, Gabriel Picolo&quot;
+ $ isbn     : chr  &quot;9781779512246&quot; &quot;9781779517999&quot; &quot;9781799503064&quot;
+ $ pub_year : chr  &quot;2023&quot; &quot;2024&quot; &quot;2026&quot;
+ $ publisher: chr  &quot;DC Comics&quot; &quot;DC Comics&quot; &quot;DC Comics&quot;</code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>df_json</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r cell-code"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>df_json</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>                  title                     authors          isbn pub_year
 1    Teen Titans: Robin Kami Garcia, Gabriel Picolo 9781779512246     2023
@@ -246,43 +234,40 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 3 DC Comics</code></pre>
 </div>
 </div>
-<blockquote class="blockquote">
-<p><strong>Note on types:</strong> Unlike <code>jsonlite</code>, <code>rjson::fromJSON()</code> returns a plain R list rather than a data frame, so the <code>do.call(rbind, ...)</code> + <code>as.data.frame()</code> conversion is required. The <code>unlist()</code> call inside <code>lapply</code> flattens the resulting list-columns into atomic vectors before <code>as.character()</code> and <code>str_trim()</code> normalize everything to clean character strings.</p>
-</blockquote>
-<hr>
+<hr />
 </section>
 <section id="align-column-order-then-compare" class="level2">
-<h2 class="anchored" data-anchor-id="align-column-order-then-compare">3 · Align column order, then compare</h2>
+<h2>3 · Align column order, then compare</h2>
 <p><code>identical()</code> is sensitive to column order. Reordering <code>df_json</code> to match <code>df_html</code> ensures a structural match before the value comparison.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Guarantee column order matches</span></span>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r cell-code"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Guarantee column order matches</span></span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>df_json <span class="ot">&lt;-</span> df_json[, <span class="fu">names</span>(df_html)]</span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>are_identical <span class="ot">&lt;-</span> <span class="fu">identical</span>(df_html, df_json)</span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Are the two data frames identical?"</span>, are_identical, <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&quot;Are the two data frames identical?&quot;</span>, are_identical, <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>)</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Are the two data frames identical? TRUE </code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Diagnostic: surface any cell-level differences if the check fails</span></span>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r cell-code"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Diagnostic: surface any cell-level differences if the check fails</span></span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span>are_identical) {</span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  mismatches <span class="ot">&lt;-</span> <span class="fu">which</span>(df_html <span class="sc">!=</span> df_json, <span class="at">arr.ind =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">Mismatches (row, col):</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">&quot;</span><span class="sc">\n</span><span class="st">Mismatches (row, col):</span><span class="sc">\n</span><span class="st">&quot;</span>)</span>
 <span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span>(mismatches)</span>
-<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">HTML values:</span><span class="sc">\n</span><span class="st">"</span>);  <span class="fu">print</span>(df_html[mismatches])</span>
-<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">JSON values:</span><span class="sc">\n</span><span class="st">"</span>);  <span class="fu">print</span>(df_json[mismatches])</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">&quot;</span><span class="sc">\n</span><span class="st">HTML values:</span><span class="sc">\n</span><span class="st">&quot;</span>);  <span class="fu">print</span>(df_html[mismatches])</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">&quot;</span><span class="sc">\n</span><span class="st">JSON values:</span><span class="sc">\n</span><span class="st">&quot;</span>);  <span class="fu">print</span>(df_json[mismatches])</span>
 <span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>} <span class="cf">else</span> {</span>
-<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"Both data frames contain exactly the same data.</span><span class="sc">\n</span><span class="st">"</span>)</span>
-<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">&quot;Both data frames contain exactly the same data.</span><span class="sc">\n</span><span class="st">&quot;</span>)</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Both data frames contain exactly the same data.</code></pre>
 </div>
 </div>
-<hr>
+<hr />
 </section>
 <section id="side-by-side-view" class="level2">
-<h2 class="anchored" data-anchor-id="side-by-side-view">4 · Side-by-side view</h2>
+<h2>4 · Side-by-side view</h2>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"--- HTML data frame ---</span><span class="sc">\n</span><span class="st">"</span>);  <span class="fu">print</span>(df_html)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r cell-code"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&quot;--- HTML data frame ---</span><span class="sc">\n</span><span class="st">&quot;</span>);  <span class="fu">print</span>(df_html)</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>--- HTML data frame ---</code></pre>
 </div>
@@ -296,7 +281,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 2 DC Comics
 3 DC Comics</code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">--- JSON data frame ---</span><span class="sc">\n</span><span class="st">"</span>); <span class="fu">print</span>(df_json)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r cell-code"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&quot;</span><span class="sc">\n</span><span class="st">--- JSON data frame ---</span><span class="sc">\n</span><span class="st">&quot;</span>); <span class="fu">print</span>(df_json)</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
 --- JSON data frame ---</code></pre>
@@ -312,12 +297,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 3 DC Comics</code></pre>
 </div>
 </div>
-<hr>
+<hr />
 </section>
 <section id="credit" class="level2">
-<h2 class="anchored" data-anchor-id="credit">Credit</h2>
-<p>Throughout the assignment, Claude (Opus 5) was used to help plan, explain concepts, flag data issues, and debug errors.</p>
-<p>Anthropic. (2026). Claude (Opus 5) [Large language model].</p>
+<h2>Credit</h2>
+<p>Throughout the assignment, Claude (Sonnet 4.6) was used to help plan, explain concepts, flag data issues, and debug errors.</p>
+<p>Anthropic. (2026). Claude (Sonnet 4.6) [Large language model].</p>
 </section>
 
 </main>
@@ -724,7 +709,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </script>
 </div> <!-- /content -->
 
+</body>
 
-
-
-</body></html>
+</html>

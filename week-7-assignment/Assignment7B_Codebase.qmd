@@ -30,7 +30,7 @@ The dataset covers three graphic novels in the *Teen Titans* series by Kami Garc
 
 ## 1 · Load the HTML data
 
-`httr::GET()` fetches the raw file from GitHub and `httr::content()` extracts the text, which is then handed to `rvest::read_html()`. The files must be pushed to GitHub first; the URL must point to `raw.githubusercontent.com`, not the regular `github.com` page (which would return GitHub's surrounding HTML instead of the file itself).
+`httr::GET()` fetches the raw file from GitHub and `httr::content()` extracts the text, which is then handed to `rvest::read_html()`.
 
 ```{r load-html}
 library(httr)
@@ -38,7 +38,6 @@ library(rvest)
 library(stringr)
 library(rjson)
 
-# Replace with your GitHub username, repo name, and branch
 github_base <- "https://raw.githubusercontent.com/shanicesmith98/data-607-assignments/refs/heads/main/week-7-assignment/"
 
 html_response <- tryCatch(
@@ -108,8 +107,6 @@ str(df_json)
 df_json
 ```
 
-> **Note on types:** Unlike `jsonlite`, `rjson::fromJSON()` returns a plain R list rather than a data frame, so the `do.call(rbind, ...)` + `as.data.frame()` conversion is required. The `unlist()` call inside `lapply` flattens the resulting list-columns into atomic vectors before `as.character()` and `str_trim()` normalize everything to clean character strings.
-
 ------------------------------------------------------------------------
 
 ## 3 · Align column order, then compare
@@ -148,6 +145,6 @@ cat("\n--- JSON data frame ---\n"); print(df_json)
 
 ## Credit
 
-Throughout the assignment, Claude (Opus 5) was used to help plan, explain concepts, flag data issues, and debug errors.
+Throughout the assignment, Claude (Sonnet 4.6) was used to help plan, explain concepts, flag data issues, and debug errors.
 
-Anthropic. (2026). Claude (Opus 5) \[Large language model\].
+Anthropic. (2026). Claude (Sonnet 4.6) \[Large language model\].
