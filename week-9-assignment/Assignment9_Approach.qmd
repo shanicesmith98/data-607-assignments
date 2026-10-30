@@ -1,0 +1,29 @@
+---
+title: "Assignment 9 - NY Times API - Approach"
+author: "Shanice Smith"
+date: today
+format: html
+editor: visual
+---
+
+## Approach
+
+The objective of this assignment is to explore data through a public API, such as the New York Times. The general tasks are to load, clean, and analyze the data are similar to previous assignments, this time with the new challenge of using a live source that replicates a real life work environment with automated and integrated applications.
+
+**Step 1**: Create an API key and securely save it in an environment variable.
+
+**Step 2**: Make the requests to an endpoint. I'll build the call with httr2 and wrap in tryCatch so we can failures are noted in the cycle.
+
+**Step 3**: Parse the JSON results. I'll use resp_body_json() to grab the results array from each response.
+
+**Step 4**: Clean up the results by trimming whitespace, removing columns we won't need or stripping any HTML tags.
+
+**Step 5**: Flatten into a clean data frame.
+
+**Step 6**: Analyze and build visualizations.
+
+------------------------------------------------------------------------
+
+**Data challenges:**
+
+Ensure the amount and structure of the results is the one we want back. We have limitations of number of requests per minute due to being on a Free tier, and I will need to "sleep" to give time between requests. Some potential cleaning of the data if there's any empty or null values, that should be turned to NA in loading, if possible.
