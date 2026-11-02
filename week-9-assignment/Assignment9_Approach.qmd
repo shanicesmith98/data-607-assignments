@@ -1,5 +1,5 @@
 ---
-title: "Assignment 9 - NY Times API - Approach"
+title: "Assignment 9 - NY Times API"
 author: "Shanice Smith"
 date: today
 format: html
@@ -27,3 +27,5 @@ The objective of this assignment is to explore data through a public API, such a
 **Data challenges:**
 
 Ensure the amount and structure of the results is the one we want back. We have limitations of number of requests per minute due to being on a Free tier, and I will need to "sleep" to give time between requests. Some potential cleaning of the data if there's any empty or null values, that should be turned to NA in loading, if possible.
+
+## Codebase
