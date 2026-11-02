@@ -4,6 +4,7 @@ author: "Shanice Smith"
 date: today
 format: html
 editor: visual
+toc: true
 ---
 
 ## Approach
@@ -32,18 +33,16 @@ Ensuring the amount and structure of the results is the one we want back. We hav
 
 ### Setup
 
-Here we will setup the environment with the packages we will use for our load, clean and analysis. We'll also test run that our API key is set within our R environment file.
+Here we will setup the environment with the packages we will use for our load, clean and analysis. We'll also assign my API key to a variable and confirm it's set within our R environment. API keys should not be made public to avoid giving others access and ensure the appropriate calls are made, so we'll keep it stored securely.
 
 ``` {r setup}
 
 library(httr2)
 library(rvest)
 library(stringr)
-library(tibble)
 library(dplyr)
 library(purrr)
 
-# Confirm the API key is present before any requests are made
 api_key <- Sys.getenv("NYT_API_KEY")
 if (!nchar(api_key)) {
   stop(
@@ -53,3 +52,129 @@ if (!nchar(api_key)) {
 }
 
 ```
+
+### Fetching the bestseller list from the API
+
+```{r fetch-function}
+fetch_bestsellers <- function(list_name) {
+  resp <- tryCatch(
+    request("https://api.nytimes.com/svc/books/v3/lists/current") |>
+      req_url_path_append(paste0(list_name, ".json")) |>
+      req_url_query(`api-key` = api_key) |>
+      req_perform(),
+    error = function(e) {
+      stop("Request failed (list = ", list_name, "): ", conditionMessage(e))
+    }
+  )
+
+  resp_check_status(resp)
+
+  # results is a metadata wrapper — the actual books sit one level deeper
+  resp_body_json(resp)[["results"]][["books"]]
+}
+```
+
+### Helper function - Stripping HTML from book descriptions
+
+```{r strip-html}
+strip_html <- function(x) {
+  if (is.na(x) || !nchar(str_trim(x))) return(NA_character_)
+  paste0("<p>", x, "</p>") |>
+    read_html() |>
+    html_text2() |>
+    str_trim()
+}
+```
+
+### Pulling out just the fields I care about
+
+```{r parse-function}
+parse_book <- function(book, list_name) {
+  tibble(
+    list_name      = list_name,
+    rank           = book[["rank"]]           %||% NA_integer_,
+    rank_last_week = book[["rank_last_week"]] %||% NA_integer_,
+    weeks_on_list  = book[["weeks_on_list"]]  %||% NA_integer_,
+    title          = str_squish(book[["title"]]       %||% NA_character_),
+    author         = str_squish(book[["author"]]      %||% NA_character_),
+    publisher      = str_trim(book[["publisher"]]     %||% NA_character_),
+    description    = strip_html(book[["description"]] %||% NA_character_),
+    isbn13         = book[["primary_isbn13"]]  %||% NA_character_
+  )
+}
+```
+
+
+### Making both API calls and combining the results
+
+```{r fetch-data, message=FALSE}
+books_fiction    <- fetch_bestsellers("hardcover-fiction")
+Sys.sleep(1)
+books_nonfiction <- fetch_bestsellers("hardcover-nonfiction")
+
+df_fiction    <- map(books_fiction,    parse_book, list_name = "hardcover-fiction")    |> bind_rows()
+df_nonfiction <- map(books_nonfiction, parse_book, list_name = "hardcover-nonfiction") |> bind_rows()
+
+df_all <- bind_rows(df_fiction, df_nonfiction)
+
+glimpse(df_all)
+```
+
+### Cleaning up the data before I analyze anything
+
+```{r clean-data}
+df_all <- df_all |>
+
+  # rank_last_week = 0 means the book is new this week, not ranked 0th
+  mutate(rank_last_week = na_if(rank_last_week, 0L)) |>
+
+  # weeks_on_list = 0 also flags a debut — at minimum it's been on one week
+  mutate(weeks_on_list = if_else(weeks_on_list == 0L, 1L, weeks_on_list)) |>
+
+  # catch any empty strings left after HTML stripping
+  mutate(description = na_if(str_trim(description), "")) |>
+
+  # negative = moved up, positive = moved down, NA = new this week
+  mutate(
+    rank_change = case_when(
+      is.na(rank_last_week) ~ NA_integer_,
+      TRUE                  ~ rank - rank_last_week
+    )
+  )
+
+# Sanity check — no book should appear twice on the same list
+df_all |>
+  count(list_name, isbn13) |>
+  filter(n > 1)
+```
+
+## Analysis
+
+### Which books have held on the longest?
+
+```{r longevity}
+df_all |>
+  arrange(list_name, desc(weeks_on_list)) |>
+  group_by(list_name) |>
+  slice_head(n = 5) |>
+  select(list_name, rank, title, author, weeks_on_list, rank_change) |>
+  print(n = 10)
+```
+
+### How do the two lists compare overall?
+
+```{r list-summary}
+df_all |>
+  group_by(list_name) |>
+  summarise(
+    avg_weeks_on_list  = round(mean(weeks_on_list, na.rm = TRUE), 1),
+    median_rank_change = median(rank_change, na.rm = TRUE),
+    pct_new_this_week  = round(mean(is.na(rank_last_week)) * 100, 1)
+  )
+```
+
+## Credit
+
+Throughout the assignment, Claude (Sonnet 4.6) was used to help plan, explain concepts, flag data issues, and debug errors.
+
+Anthropic. (2026). Claude (Sonnet 4.6) [Large language model].
