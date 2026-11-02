@@ -89,15 +89,20 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#approach" id="toc-approach" class="nav-link active" data-scroll-target="#approach">Approach</a></li>
+  <li><a href="#approach" id="toc-approach" class="nav-link active" data-scroll-target="#approach">Approach</a>
+  <ul class="collapse">
+  <li><a href="#endpoint" id="toc-endpoint" class="nav-link" data-scroll-target="#endpoint">Endpoint</a></li>
+  <li><a href="#steps" id="toc-steps" class="nav-link" data-scroll-target="#steps">Steps</a></li>
+  <li><a href="#data-challenges" id="toc-data-challenges" class="nav-link" data-scroll-target="#data-challenges">Data challenges</a></li>
+  </ul></li>
   <li><a href="#codebase" id="toc-codebase" class="nav-link" data-scroll-target="#codebase">Codebase</a>
   <ul class="collapse">
   <li><a href="#setup" id="toc-setup" class="nav-link" data-scroll-target="#setup">Setup</a></li>
-  <li><a href="#fetching-the-bestseller-list-from-the-api" id="toc-fetching-the-bestseller-list-from-the-api" class="nav-link" data-scroll-target="#fetching-the-bestseller-list-from-the-api">Fetching the bestseller list from the API</a></li>
+  <li><a href="#data-fetching" id="toc-data-fetching" class="nav-link" data-scroll-target="#data-fetching">Data Fetching</a></li>
   <li><a href="#helper-function---stripping-html-from-book-descriptions" id="toc-helper-function---stripping-html-from-book-descriptions" class="nav-link" data-scroll-target="#helper-function---stripping-html-from-book-descriptions">Helper function - Stripping HTML from book descriptions</a></li>
-  <li><a href="#pulling-out-just-the-fields-i-care-about" id="toc-pulling-out-just-the-fields-i-care-about" class="nav-link" data-scroll-target="#pulling-out-just-the-fields-i-care-about">Pulling out just the fields I care about</a></li>
-  <li><a href="#making-both-api-calls-and-combining-the-results" id="toc-making-both-api-calls-and-combining-the-results" class="nav-link" data-scroll-target="#making-both-api-calls-and-combining-the-results">Making both API calls and combining the results</a></li>
-  <li><a href="#cleaning-up-the-data-before-i-analyze-anything" id="toc-cleaning-up-the-data-before-i-analyze-anything" class="nav-link" data-scroll-target="#cleaning-up-the-data-before-i-analyze-anything">Cleaning up the data before I analyze anything</a></li>
+  <li><a href="#defining-fields" id="toc-defining-fields" class="nav-link" data-scroll-target="#defining-fields">Defining fields</a></li>
+  <li><a href="#making-api-calls" id="toc-making-api-calls" class="nav-link" data-scroll-target="#making-api-calls">Making API Calls</a></li>
+  <li><a href="#clean-up" id="toc-clean-up" class="nav-link" data-scroll-target="#clean-up">Clean Up</a></li>
   </ul></li>
   <li><a href="#analysis" id="toc-analysis" class="nav-link" data-scroll-target="#analysis">Analysis</a>
   <ul class="collapse">
@@ -143,16 +148,24 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <section id="approach" class="level2">
 <h2 class="anchored" data-anchor-id="approach">Approach</h2>
-<p>The objective of this assignment is to explore data through a public API, such as the New York Times. The general tasks are to load, clean, and analyze the data are similar to previous assignments, this time with the new challenge of using a live source that replicates a real life work environment with automated and integrated applications. With the right permissions, we’re able to access data from another system (NYT) and connect it to ours (RStudio).</p>
+<p>The objective of this assignment is to explore data through a public API, such as the New York Times. The general tasks are to load, clean, and analyze the data are similar to previous assignments, this time with the new challenge of using a live source that replicates a real life work environment with automated and integrated applications. With the right permissions, we’re able to access data from another system (NYT) and connect it to ours.</p>
+<section id="endpoint" class="level3">
+<h3 class="anchored" data-anchor-id="endpoint">Endpoint</h3>
+<p>I’ve chosen the books endpoint, which return the current ranked entries for a named NYT Best Sellers list. We are pulling from the lists <strong>hardcover-fiction</strong> and <strong>hardcover-nonfiction</strong> to answer: <em>which books on each list have been there the longest, and how do their current ranks compare to where they stood last week?</em></p>
+</section>
+<section id="steps" class="level3">
+<h3 class="anchored" data-anchor-id="steps">Steps</h3>
 <p><strong>Step 1</strong>: Create an API key and securely save it in an environment variable.</p>
 <p><strong>Step 2</strong>: Make the requests to an endpoint. For this assignment, I’ll use the Books endpoint. I’ll build the call with httr2 and wrap in tryCatch so we can failures are noted in the cycle.</p>
 <p><strong>Step 3</strong>: Parse the JSON results. I’ll use resp_body_json() to grab the results array from each response.</p>
 <p><strong>Step 4</strong>: Clean up the results by trimming whitespace, removing columns we won’t need or stripping any HTML tags.</p>
 <p><strong>Step 5</strong>: Flatten into a clean data frame.</p>
 <p><strong>Step 6</strong>: Analyze and build visualizations.</p>
-<hr>
-<p><strong>Data challenges:</strong></p>
+</section>
+<section id="data-challenges" class="level3">
+<h3 class="anchored" data-anchor-id="data-challenges">Data challenges</h3>
 <p>Ensuring the amount and structure of the results is the one we want back. We have limitations of number of requests per minute due to being on a Free tier, and I will need to “sleep” to give time between requests. Some potential cleaning of the data if there’s any empty or null values, that should be turned to NA in loading, if possible.</p>
+</section>
 </section>
 <section id="codebase" class="level2">
 <h2 class="anchored" data-anchor-id="codebase">Codebase</h2>
@@ -189,8 +202,9 @@ Attaching package: 'dplyr'</code></pre>
 <span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
-<section id="fetching-the-bestseller-list-from-the-api" class="level3">
-<h3 class="anchored" data-anchor-id="fetching-the-bestseller-list-from-the-api">Fetching the bestseller list from the API</h3>
+<section id="data-fetching" class="level3">
+<h3 class="anchored" data-anchor-id="data-fetching">Data Fetching</h3>
+<p>Here we define the <code>fetch_bestsellers</code> function that’ll send a request to the Books endpoint with our API Key based on a specific list name (ex. Fiction, Non-fiction, etc.), and return the data if successful or an error if not.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>fetch_bestsellers <span class="ot">&lt;-</span> <span class="cf">function</span>(list_name) {</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  resp <span class="ot">&lt;-</span> <span class="fu">tryCatch</span>(</span>
@@ -212,6 +226,7 @@ Attaching package: 'dplyr'</code></pre>
 </section>
 <section id="helper-function---stripping-html-from-book-descriptions" class="level3">
 <h3 class="anchored" data-anchor-id="helper-function---stripping-html-from-book-descriptions">Helper function - Stripping HTML from book descriptions</h3>
+<p>We ran into some issues with getting the plain text from the description field. We’re wrapping the response with <code>&lt;p&gt;</code>​tags in order for the input to always look like HTML to the <code>read_html()</code>​function, and not treat it as a file path.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>strip_html <span class="ot">&lt;-</span> <span class="cf">function</span>(x) {</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">is.na</span>(x) <span class="sc">||</span> <span class="sc">!</span><span class="fu">nchar</span>(<span class="fu">str_trim</span>(x))) <span class="fu">return</span>(<span class="cn">NA_character_</span>)</span>
@@ -222,8 +237,9 @@ Attaching package: 'dplyr'</code></pre>
 <span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
-<section id="pulling-out-just-the-fields-i-care-about" class="level3">
-<h3 class="anchored" data-anchor-id="pulling-out-just-the-fields-i-care-about">Pulling out just the fields I care about</h3>
+<section id="defining-fields" class="level3">
+<h3 class="anchored" data-anchor-id="defining-fields">Defining fields</h3>
+<p>Here we are naming the Book fields we want to use further on for analysis after our API call, filtering out the other fields that are not needed.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>parse_book <span class="ot">&lt;-</span> <span class="cf">function</span>(book, list_name) {</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tibble</span>(</span>
@@ -240,11 +256,12 @@ Attaching package: 'dplyr'</code></pre>
 <span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
-<section id="making-both-api-calls-and-combining-the-results" class="level3">
-<h3 class="anchored" data-anchor-id="making-both-api-calls-and-combining-the-results">Making both API calls and combining the results</h3>
+<section id="making-api-calls" class="level3">
+<h3 class="anchored" data-anchor-id="making-api-calls">Making API Calls</h3>
+<p>Here we actually make the API calls, specifically for the Fiction and Nonfiction book lists, then combine the data frames. We include a sleep in between API calls to respect NYT server’s rate limits and avoid appearing as a bot. We were waiting for 1 second, but ran into rate limiting errors during testing, so it’s currently bumped up to 4 seconds.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>books_fiction    <span class="ot">&lt;-</span> <span class="fu">fetch_bestsellers</span>(<span class="st">"hardcover-fiction"</span>)</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="fu">Sys.sleep</span>(<span class="dv">1</span>)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="fu">Sys.sleep</span>(<span class="dv">4</span>)</span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>books_nonfiction <span class="ot">&lt;-</span> <span class="fu">fetch_bestsellers</span>(<span class="st">"hardcover-nonfiction"</span>)</span>
 <span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>df_fiction    <span class="ot">&lt;-</span> <span class="fu">map</span>(books_fiction,    parse_book, <span class="at">list_name =</span> <span class="st">"hardcover-fiction"</span>)    <span class="sc">|&gt;</span> <span class="fu">bind_rows</span>()</span>
@@ -268,8 +285,8 @@ $ isbn13         &lt;chr&gt; "9781682818084", "9781250412607", "9781538780046", 
 </div>
 </div>
 </section>
-<section id="cleaning-up-the-data-before-i-analyze-anything" class="level3">
-<h3 class="anchored" data-anchor-id="cleaning-up-the-data-before-i-analyze-anything">Cleaning up the data before I analyze anything</h3>
+<section id="clean-up" class="level3">
+<h3 class="anchored" data-anchor-id="clean-up">Clean Up</h3>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>df_all <span class="ot">&lt;-</span> df_all <span class="sc">|&gt;</span></span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
@@ -290,7 +307,7 @@ $ isbn13         &lt;chr&gt; "9781682818084", "9781250412607", "9781538780046", 
 <span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>    )</span>
 <span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>  )</span>
 <span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Sanity check — no book should appear twice on the same list</span></span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Filter out any books that might appear twice by checking the ISBN number</span></span>
 <span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a>df_all <span class="sc">|&gt;</span></span>
 <span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(list_name, isbn13) <span class="sc">|&gt;</span></span>
 <span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(n <span class="sc">&gt;</span> <span class="dv">1</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>

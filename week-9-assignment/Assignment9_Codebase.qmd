@@ -9,7 +9,13 @@ toc: true
 
 ## Approach
 
-The objective of this assignment is to explore data through a public API, such as the New York Times. The general tasks are to load, clean, and analyze the data are similar to previous assignments, this time with the new challenge of using a live source that replicates a real life work environment with automated and integrated applications. With the right permissions, we're able to access data from another system (NYT) and connect it to ours (RStudio).
+The objective of this assignment is to explore data through a public API, such as the New York Times. The general tasks are to load, clean, and analyze the data are similar to previous assignments, this time with the new challenge of using a live source that replicates a real life work environment with automated and integrated applications. With the right permissions, we're able to access data from another system (NYT) and connect it to ours.
+
+### Endpoint
+
+I've chosen the books endpoint, which return the current ranked entries for a named NYT Best Sellers list. We are pulling from the lists **hardcover-fiction** and **hardcover-nonfiction** to answer: *which books on each list have been there the longest, and how do their current ranks compare to where they stood last week?*
+
+### Steps
 
 **Step 1**: Create an API key and securely save it in an environment variable.
 
@@ -23,9 +29,7 @@ The objective of this assignment is to explore data through a public API, such a
 
 **Step 6**: Analyze and build visualizations.
 
-------------------------------------------------------------------------
-
-**Data challenges:**
+### Data challenges
 
 Ensuring the amount and structure of the results is the one we want back. We have limitations of number of requests per minute due to being on a Free tier, and I will need to "sleep" to give time between requests. Some potential cleaning of the data if there's any empty or null values, that should be turned to NA in loading, if possible.
 
@@ -35,7 +39,7 @@ Ensuring the amount and structure of the results is the one we want back. We hav
 
 Here we will setup the environment with the packages we will use for our load, clean and analysis. We'll also assign my API key to a variable and confirm it's set within our R environment. API keys should not be made public to avoid giving others access and ensure the appropriate calls are made, so we'll keep it stored securely.
 
-``` {r setup}
+```{r setup}
 
 library(httr2)
 library(rvest)
@@ -53,7 +57,9 @@ if (!nchar(api_key)) {
 
 ```
 
-### Fetching the bestseller list from the API
+### Data Fetching
+
+Here we define the `fetch_bestsellers` function that'll send a request to the Books endpoint with our API Key based on a specific list name (ex. Fiction, Non-fiction, etc.), and return the data if successful or an error if not.
 
 ```{r fetch-function}
 fetch_bestsellers <- function(list_name) {
@@ -76,6 +82,8 @@ fetch_bestsellers <- function(list_name) {
 
 ### Helper function - Stripping HTML from book descriptions
 
+We ran into some issues with getting the plain text from the description field. We're wrapping the response with `<p>`​tags in order for the input to always look like HTML to the `read_html()`​function, and not treat it as a file path.
+
 ```{r strip-html}
 strip_html <- function(x) {
   if (is.na(x) || !nchar(str_trim(x))) return(NA_character_)
@@ -86,7 +94,9 @@ strip_html <- function(x) {
 }
 ```
 
-### Pulling out just the fields I care about
+### Defining fields
+
+Here we are naming the Book fields we want to use further on for analysis after our API call, filtering out the other fields that are not needed.
 
 ```{r parse-function}
 parse_book <- function(book, list_name) {
@@ -104,12 +114,13 @@ parse_book <- function(book, list_name) {
 }
 ```
 
+### Making API Calls
 
-### Making both API calls and combining the results
+Here we actually make the API calls, specifically for the Fiction and Nonfiction book lists, then combine the data frames. We include a sleep in between API calls to respect NYT server's rate limits and avoid appearing as a bot. We were waiting for 1 second, but ran into rate limiting errors during testing, so it's currently bumped up to 4 seconds.
 
 ```{r fetch-data, message=FALSE}
 books_fiction    <- fetch_bestsellers("hardcover-fiction")
-Sys.sleep(1)
+Sys.sleep(4)
 books_nonfiction <- fetch_bestsellers("hardcover-nonfiction")
 
 df_fiction    <- map(books_fiction,    parse_book, list_name = "hardcover-fiction")    |> bind_rows()
@@ -120,7 +131,7 @@ df_all <- bind_rows(df_fiction, df_nonfiction)
 glimpse(df_all)
 ```
 
-### Cleaning up the data before I analyze anything
+### Clean Up
 
 ```{r clean-data}
 df_all <- df_all |>
@@ -142,7 +153,7 @@ df_all <- df_all |>
     )
   )
 
-# Sanity check — no book should appear twice on the same list
+# Filter out any books that might appear twice by checking the ISBN number
 df_all |>
   count(list_name, isbn13) |>
   filter(n > 1)
@@ -177,4 +188,4 @@ df_all |>
 
 Throughout the assignment, Claude (Sonnet 4.6) was used to help plan, explain concepts, flag data issues, and debug errors.
 
-Anthropic. (2026). Claude (Sonnet 4.6) [Large language model].
+Anthropic. (2026). Claude (Sonnet 4.6) \[Large language model\].
