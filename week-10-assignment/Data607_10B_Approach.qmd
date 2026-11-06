@@ -1,0 +1,26 @@
+---
+title: "Assignment 10B - NobelPrize.org"
+author: "Shanice Smith"
+date: today
+format: html
+editor: visual
+toc: true
+---
+
+## Approach
+
+The objective of this assignment is to practice ingesting and parsing JSON files pulled from public APIs and provide answers to some data questions I discover from the dataset. In this assignment, we will use the Nobel Prize API to work with.
+
+Step 1 — Understand the API data structure. The Nobel Prize API has two endpoints — /laureates and /nobelPrizes — and requires no API key. I have to scope out the fields and data that's returned from a request to understand what issues or challenges I might encounter (listed below).
+
+Step 2 — Paginate through the endpoints. I will write a function to fetch the data (recursively) until I hit the end of the records, with short pauses between the requests.
+
+Step 3 — Parse the nested JSON into flat data frames.
+
+Step 4 — Unnest and flatten data, join any records if need be.
+
+Step 5 — Answer the four questions I create.
+
+## Data Challenges
+
+One challenge I anticipate when working with JSON files is deeply nested data fields, and needing to find the right paths to pull out that data. Another challenge would be handling pagination since the full dataset might span several pages, which requires more than one request to the API.
