@@ -1,0 +1,320 @@
+---
+title: "Accessible Data Visualization"
+subtitle: "Making Data Clearer for Everyone"
+author: "Shanice Smith"
+date: today
+format:
+  revealjs:
+    theme: simple
+    slide-number: true
+    show-slide-number: all
+    transition: fade
+    center: false
+    width: 1280
+    height: 720
+    fontsize: 28px
+    smaller: true
+    code-fold: false
+    toc: false
+    footer: "Data Science in Context"
+    embed-resources: true
+execute:
+  echo: false
+  warning: false
+  message: false
+---
+
+```{r}
+#| label: setup
+#| include: false
+
+library(ggplot2)
+library(viridis)
+library(tidyverse)
+
+movies <- read_csv(
+  "https://raw.githubusercontent.com/shanicesmith98/data-607-assignments/main/week-2-assignment/latest_movies_survey_results_2a.csv"
+)
+
+# Inspect the data
+glimpse(movies)
+summary(movies)
+
+# Check for duplicate records
+movies |>
+  count(user_id, movie_name, rating) |>
+  filter(n > 1)
+
+```
+
+## Situation: Data visualization is about communication
+
+### We use data visualizations to:
+
+- Identify patterns and trends
+- Communicate findings to stakeholders
+- Support informed business decisions
+
+**But can everyone understand the visualizations we create?**
+
+::: notes
+As data scientists, we spend a lot of time creating visualizations.
+
+We use charts and graphs to explain trends, communicate insights, and help people make decisions.
+
+But there's something we don't always think about: Can everyone actually understand the visualizations we're creating?
+
+A chart might look beautiful and communicate an insight to us, but that doesn't necessarily mean it's accessible to everyone.
+
+That's what I'd like to talk about today.
+:::
+
+---
+
+## Complication: A beautiful chart can still exclude people
+
+### Not everyone experiences visual information the same way.
+
+- **Color vision deficiencies:** Difficulty distinguishing certain colors.
+- **Low vision:** Small fonts and poor contrast make charts difficult to read.
+- **Color-dependent information:** Important differences may only be communicated through color.
+- **Screen readers:** Charts without text descriptions can be inaccessible.
+
+::: notes
+The problem is that people don't all experience visual information in the same way.
+
+For example, someone with red-green color blindness may have difficulty distinguishing two categories in a chart that relies entirely on red and green.
+
+Someone with low vision might struggle with small labels, light gray text, or poor contrast.
+
+And someone using a screen reader may not get meaningful information from a chart if we haven't provided a text description.
+
+We might be making important business insights harder to access for the very people who need them.
+:::
+
+---
+
+## Question: How can we make our visualizations more accessible?
+
+### How can we improve accessibility without sacrificing quality or adding unnecessary complexity?
+
+**The good news:** We can make meaningful improvements using tools already available in R and RStudio.
+
+::: notes
+So, the question is: How can we make our visualizations more accessible without making our workflow overly complicated?
+
+The good news is that we don't necessarily need new tools or advanced programming skills.
+
+There are several relatively simple design choices we can incorporate into our existing R and RStudio workflows.
+:::
+
+---
+
+## Answer: Four practical techniques
+
+### Small design changes can make a big difference.
+
+::: {.columns}
+
+::: {.column width="50%"}
+
+#### 1. Choose accessible colors
+
+Use color palettes designed for people with color vision deficiencies.
+
+**R package:** `viridis`
+
+#### 2. Don't rely on color alone
+
+Use direct labels, symbols, patterns, and different line types.
+
+:::
+
+::: {.column width="50%"}
+
+#### 3. Improve readability
+
+- Larger fonts
+- Strong contrast
+- Clear titles and labels
+- Less visual clutter
+
+#### 4. Include alternative text
+
+Provide written descriptions so screen reader users can understand the chart's key message.
+
+**R package:** `BrailleR`
+
+:::
+:::
+
+::: notes
+There are four things I would recommend.
+
+First, choose accessible colors. One great R package for this is viridis. It provides color palettes designed to be perceptually uniform and usable by people with common color vision deficiencies.
+
+Second, don't rely on color alone. Instead of just coloring two groups differently, include labels directly on the chart.
+
+Third, focus on readability. Use larger fonts, sufficient contrast, and avoid unnecessary visual clutter.
+
+Finally, provide alternative text, also called alt text. This is a written description that allows people using screen readers to understand the important information in a visualization.
+
+These are small changes, but they can make a significant difference.
+:::
+
+---
+
+## Answer: Let's put it into practice with R
+
+### Example: Average movie rating by genre
+
+```{r}
+#| label: accessible-chart-example
+#| fig-width: 9
+#| fig-height: 5
+#| fig-align: center
+#| fig-alt: Horizontal bar chart showing average movie ratings by genre.
+
+genre_ratings <- movies |>
+  group_by(genre) |>
+  summarize(
+    average_rating = mean(rating, na.rm = TRUE),
+    responses = n(),
+    .groups = "drop"
+  ) |>
+  arrange(average_rating)
+
+movie_plot <- ggplot(
+  genre_ratings,
+  aes(
+    x = average_rating,
+    y = reorder(genre, average_rating),
+    fill = genre
+  )
+) +
+  geom_col(width = 0.7) +
+  geom_text(
+    aes(label = round(average_rating, 2)),
+    hjust = -0.2,
+    size = 4.5
+  ) +
+  scale_fill_viridis_d(option = "D") +
+  scale_x_continuous(
+    limits = c(0, 5.5),
+    breaks = 0:5
+  ) +
+  labs(
+    title = "Average Movie Rating by Genre",
+    subtitle = "Based on survey responses",
+    x = "Average rating (scale of 1–5)",
+    y = "Movie genre"
+  ) +
+  theme_minimal(base_size = 16) +
+  theme(
+    legend.position = "none",
+    plot.title = element_text(face = "bold")
+  )
+
+movie_plot
+```
+
+### What makes this chart more accessible?
+
+| R code | Accessibility benefit |
+|---|---|
+| `scale_fill_viridis_d()` | Accessible color palette |
+| `geom_text()` | Displays actual values |
+| `base_size = 16` | Improves readability |
+| `labs()` | Descriptive titles and axes |
+| `fig-alt` | Provides a text description |
+
+::: notes
+Here's a quick example using ggplot2.
+
+Imagine we're showing average movie ratings by genre.
+
+I've used the viridis color palette to make the categories easier to distinguish.
+
+I've also added the actual rating values directly next to each bar, so someone doesn't have to estimate values by looking at the axis.
+
+I've increased the font size and included descriptive titles and axis labels.
+
+I've also included alternative text using Quarto's fig-alt option. This provides a text alternative for the chart in supported HTML output.
+
+The point is that we haven't done anything particularly complicated. We've simply made a few intentional design decisions that improve the chart's usability.
+:::
+
+---
+
+## Accessibility Beyond the Visual
+
+### What does BrailleR tell us about this chart?
+
+```{r}
+#| label: brailler-description
+#| echo: false
+#| results: markup
+#| comment: ""
+#| warning: false
+#| message: false
+
+BrailleR::VI(movie_plot)
+
+```
+
+--- 
+
+## Why Does This Matter?
+
+- **Alternative communication:** Provides information about a chart in text form.
+- **Screen reader support:** Text descriptions can help people who cannot interpret visual charts.
+- **Greater understanding:** Explains chart elements, labels, and data patterns.
+- **Inclusive design:** Encourages data scientists to think beyond visual presentation.
+
+::: notes
+BrailleR is particularly interesting because it helps us explore
+how a visualization can be communicated without relying entirely
+on the visual itself.
+
+Its VI function provides a textual interpretation of the graph.
+However, automatic descriptions are not a replacement for carefully
+written alt text. We still need to review the output to make sure
+it accurately communicates the important findings.
+:::
+
+---
+
+## Conclusion: Accessibility is better data communication
+
+### Four things to remember:
+
+1. Design for different visual abilities.
+2. Communicate information in more than one way.
+3. Use R packages to simplify accessibility.
+4. Test your visualizations before sharing.
+
+### Don't just ask whether your visualization looks good.
+
+# Ask whether everyone can understand it.
+
+::: notes
+To wrap up, accessibility shouldn't be something we think about after creating a visualization. It should be part of the design process from the beginning.
+
+As data scientists, our responsibility isn't just to analyze data or create attractive charts. It's to communicate information in a way that people can actually understand and use.
+
+And the great thing is that we can start doing this today with tools we're already familiar with, like ggplot2 and viridis.
+
+My takeaway is simple: Don't just ask whether your visualization looks good. Ask whether everyone can understand it.
+
+Thank you!
+:::
+
+---
+
+## Further learning
+
+- [viridis: Color palettes for R](https://sjmgarnier.github.io/viridis/)
+- [ggplot2 documentation](https://ggplot2.tidyverse.org/)
+- [Quarto figure documentation](https://quarto.org/docs/authoring/figures.html)
+- [W3C Web Content Accessibility Guidelines (WCAG)](https://www.w3.org/WAI/WCAG22/)
+- [BrailleR Package](https://github.com/ajrgodfrey/brailler)
