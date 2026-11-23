@@ -1,7 +1,8 @@
 ---
 title: "Tumblr's Recommender System"
+subtitle: "A Scenario Design Analysis"
 author: "Shanice Smith"
-date: today
+date: "November 22, 2026"
 editor: visual
 format:
   html:
@@ -13,29 +14,31 @@ format:
 
 ## Overview
 
-Most of my youth and current years on the internet has been spent on Tumblr, where it has a unique case of being a platform where a big chunk of the user base actively resists being recommended to. Which is why I decided to analyze its current recommender system, to learn more on their user base and possible rooms of improvements for this assignment.
+I've spent most of my time online, from my teens until now, on Tumblr, a platform where a big chunk of the user base actively resists being recommended to. That's why I decided to analyze its recommender system for this assignment: to learn more about its users and find where there's room for improvement.
 
+Some quick background for anyone who hasn't been on Tumblr: Automattic (the company behind WordPress.com) acquired Tumblr in 2019, and the site hosts over half a billion blogs ([TechCrunch](https://techcrunch.com/2024/08/28/tumblr-to-move-its-half-a-billion-blogs-to-wordpress/)). Its audience skews young. As of 2025, Gen Z made up about 50% of Tumblr's monthly active users and 60% of new sign-ups ([Android Headlines](https://www.androidheadlines.com/2025/04/tumblr-is-reportedly-reviving-as-gen-z-take-interest-in-the-platform.html)).
+
+In July 2023, Tumblr staff posted a "Core Product Strategy" that explained the problem from the company's side: Tumblr had historically expected users to curate their own feeds, but that adds friction and only works for a small slice of its audience ([Tumblr Staff](https://staff.tumblr.com/post/722477242948747264/tumblrs-core-product-strategy); [Engadget](https://www.engadget.com/tumblrs-building-a-tiktok-inspired-feed-in-bid-to-grow-its-user-base-220929704.html)).
+
+The users' side went very differently. When the post said Tumblr would improve "algorithmic ranking capabilities across all feeds," many users read it as Tumblr forcing an algorithmic feed on them, and the site was in an uproar ([TechCrunch](https://techcrunch.com/2023/07/12/tumblr-is-losing-30m-each-year-ceo-says)). The most viral poll got over 130,000 votes in a single day and showed overwhelming opposition to an algorithmic feed ([Know Your Meme](https://knowyourmeme.com/memes/events/2023-tumblr-changes)).
+
+For that reason, I'm doing the Scenario Design analysis twice. The organization and its users want almost opposite things from the recommender, so I expect each analysis to turn up different goals.
 
 ## Scenario Design #1: Tumblr (the Organization)
 
-In July 2023, Tumblr staff posted a "Core Product Strategy" that explained the problem from the company's side: Tumblr had historically expected users to curate their own feeds, but that adds friction and only works for a small slice of its audience ([Engadget](https://www.engadget.com/tumblrs-building-a-tiktok-inspired-feed-in-bid-to-grow-its-user-base-220929704.html)).
-
-The users' side went very differently. A lot of the existing user base protested, especially at the idea that an algorithmic feed could replace the classic chronological one. The most viral poll got over 130,000 votes in a single day and showed overwhelming opposition ([Know Your Meme](https://knowyourmeme.com/memes/events/2023-tumblr-changes)).
-
-
 **1. Who are the target users?**
 
-This is Tumblr's product team, working inside Automattic.
+The "users" here are Tumblr's product team inside Automattic, who need the recommender to drive growth. I'd also count advertisers and people paying to promote posts through Blaze, since recommendations decide whether their content gets seen.
 
-The team is small and under pressure. A leaked 2023 memo from CEO Matt Mullenweg said Automattic hadn't gotten the results it expected from the 600+ person-years of effort put into Tumblr since the acquisition ([Britannica](https://www.britannica.com/topic/Tumblr)). Starting in 2024, Tumblr moved to smaller, more focused teams working on the core parts of the site ([TechCrunch](https://techcrunch.com/2023/11/09/tumblr-to-run-on-skeleton-crew-as-parent-company-automattic-absorbs-staff)).
+This team is small and under pressure. A leaked 2023 memo from CEO Matt Mullenweg said Automattic hadn't gotten the expected results from the 600+ person-years of effort put into Tumblr since the acquisition ([Britannica](https://www.britannica.com/topic/Tumblr)).
 
 **2. What are their key goals?**
 
 - Grow the user base and keep new users around.
 - Help creators reach audiences.
-- Eventually make the platform sustainable, since Tumblr still isn't profitable.
+- Eventually make the platform sustainable, since Tumblr has continued to lose money ([TechCrunch](https://techcrunch.com/?p=2930485)).
 
-The 2023 strategy laid out six guiding principles:
+The 2023 strategy laid out six guiding principles ([Tumblr Staff](https://staff.tumblr.com/post/722477242948747264/tumblrs-core-product-strategy)):
 
 1.  Expand how new users discover Tumblr and sign up
 2.  Show high-quality content when users open the app
@@ -46,33 +49,35 @@ The 2023 strategy laid out six guiding principles:
 
 **3. How can the recommender help them accomplish those goals?**
 
-- **Better ranking.** Tumblr said it wanted to "improve our algorithmic ranking capabilities across all feeds."
+- **Better ranking.** Tumblr said it wanted to "improve our algorithmic ranking capabilities across all feeds" ([Tumblr Staff](https://staff.tumblr.com/post/722477242948747264/tumblrs-core-product-strategy)).
 - **Solving cold start for newbies.** A brand-new user follows nobody, so a purely follow-based dashboard is empty. Recommendations fill that gap.
 - **Reach for smaller creators.** Recommendations can push newer or smaller creators to people outside their own follower networks.
 
-### Scenario Design #2: Tumblr's Users
+## Scenario Design #2: Tumblr's Users
 
 Tumblr's users aren't one group, so I split them into three.
 
 **1. Who are the target users?**
 
 - **Longtime users.** They built their dashboard by hand over years and are deeply attached to it.
-- **New users.** Many are Gen Z, and they often show up from other platforms during moments of chaos. For example, sign-ups jumped as the US TikTok ban got close, and again when Brazil temporarily banned X ([Android Headlines](https://www.androidheadlines.com/2025/04/tumblr-is-reportedly-reviving-as-gen-z-take-interest-in-the-platform.html)).
+- **New users.** Many are Gen Z, and they often show up from other platforms during moments of chaos. For example, active users jumped as the US TikTok ban got close, and sign-ups spiked when Brazil temporarily banned X ([Android Headlines](https://www.androidheadlines.com/2025/04/tumblr-is-reportedly-reviving-as-gen-z-take-interest-in-the-platform.html)).
 - **Creators.** Artists, writers, fan creators, and meme-makers. Tumblr is famously where fandoms form around shared interests.
 
-\[Add a line here about which group *you* fall into and how you use Tumblr.\]
+These groups aren't mutually exclusive, and plenty of people belong to more than one.
+
+I'm a mix of a longtime user and a creator. I share creative writing and fandom-related posts with peers around the world. I post my own content, reblog (share) other people's content, and promote my posts on my other social media accounts to bring more attention to my Tumblr.
 
 **2. What are their key goals?**
 
-- **Longtime users want control and chronology.** Many say that being able to curate their own experience, without an algorithm deciding for them, is the main reason they use Tumblr at all.
+- **Longtime users want control and chronology.** For many of us, being able to curate our own experience, without an algorithm deciding for us, is the main reason we use Tumblr at all.
 - **New users want to find their people fast.** They're looking for their fandom or niche without needing a PhD in Tumblr culture first.
 - **Creators want their work seen** by the right audience, without being forced to chase engagement.
 - **Everyone wants to avoid content they don't want to see**, whether that's spoilers, triggering topics, or mature content.
 
 **3. How can the recommender help them accomplish those goals?**
 
-- **Let users choose how much algorithm they get.** Turning off "Include posts liked by the blogs you follow," "Best stuff first," and "Based on your likes" leaves only posts from blogs you follow, newest first.
-- **Organize discovery around interests, not virality.** Communities give users dedicated feeds separate from the algorithmic "For You" and chronological "Following" feeds. They can be as broad as Taylor Swift fans or as niche as fans of the *Wicked* book who haven't seen the musical ([TechCrunch](https://techcrunch.com/2024/05/28/tumblr-launches-its-semi-private-communities-in-open-beta)).
+- **Let users choose how much algorithm they get.** Turning off "Best stuff first," "Include stuff in your orbit," "Based on your likes," and "Include followed tag posts" leaves only posts from blogs you follow, newest first.
+- **Organize discovery around interests, not virality.** Communities provide interest-based spaces where users can find and interact with people who share specific interests. Each one has its own feed, separate from the algorithmic "For You" and chronological "Following" feeds. They can be as broad as Taylor Swift fans or as niche as fans of the *Wicked* book who haven't seen the musical ([TechCrunch](https://techcrunch.com/?p=2930485)).
 - **Let users filter.** Community labels let posts be tagged for drug and alcohol addiction, violence, and sexual content, and users under 18 are automatically blocked from seeing labeled content ([TechCrunch](https://techcrunch.com/2022/09/27/tumblr-bring-back-porn-nsfw-community-labels)).
 
 ## Reverse Engineering Tumblr's Recommender
@@ -81,9 +86,9 @@ Tumblr hasn't published a detailed paper on its recommender models the way Amazo
 
 ### What I Can See in the Interface
 
-\[Screenshot: Dashboard settings page\]
+![Tumblr's Dashboard Preferences settings](images/Example1.png){fig-alt="Tumblr Dashboard Preferences screen showing toggles for the interface"}
 
-\[Screenshot: For You and Following tabs\]
+![The For You and Following tabs on the Tumblr dashboard](images/Example2.png){fig-alt="Top of the Tumblr dashboard showing the Following and For You feed tabs"}
 
 Here's every recommendation "surface" I could find:
 
@@ -95,17 +100,17 @@ Here's every recommendation "surface" I could find:
 - **For You, Explore/Trending, Communities, and tag search pages.**
 - **Onboarding.** A new account's dashboard is full of recommendations based on the topics picked during sign-up, and you see fewer as you follow more blogs.
 
-\[Add anything else you notice in your own account, like recommended blogs or Blaze (paid promotion) posts.\]
+Personally, I use browser extensions to hide most of the algorithmic content (Based on Your Likes, the For You tab), because I'm partial to the curated experience I've built over the last 10 years on the site. And I'm not the only one. The fact that users like me install third-party tools (ex. XKit) to reshape our feeds is pretty strong evidence that Tumblr users want algorithmic *choice*.
 
 ### Under the Hood: StreamBuilder
 
-This was the coolest find. Tumblr open-sourced the framework behind its feeds. It's called **StreamBuilder**, it's written in PHP (a language I work in, so I can actually read it), and the code is on [GitHub](https://github.com/Automattic/stream-builder). According to Tumblr's announcement:
+Tumblr open-sourced the framework behind its feeds, **StreamBuilder**, it's written in PHP and the code is on [GitHub](https://github.com/Automattic/stream-builder). According to [Tumblr's announcement](https://www.tumblr.com/engineering/722102563011493888/streambuilder-our-open-source-framework-for):
 
 - It powers the Following feed, For You, search results, blog pages, tag pages, and blog recommendations.
 - Posts from blogs you follow, posts from tags you follow, and blog recommendations are each a **separate stream** with its own logic, all built on the same framework.
 - Recommendations are **injected at set intervals**, posts are **filtered** based on who you've blocked, and posts are **ranked for relevance** only if "Best stuff first" is turned on.
 
-Based on that, here's my best guess at how a dashboard gets built:
+Based on that, here's my best guess at how a dashboard gets built. The filtering by tags and labels and the engagement-based ranking are my assumptions; the announcement only confirms mixing, injection, block filtering, and optional ranking.
 
 ```{mermaid}
 flowchart LR
@@ -128,7 +133,7 @@ flowchart LR
 | **Utility matrix** | Users × posts, filled with *implicit* feedback (likes, reblogs, replies, follows) instead of star ratings. It's basically 1s and blanks, and a blank doesn't mean "disliked." |
 | **Content-based filtering** | **Tags are the item profiles.** The chapter literally discusses tags as a way to get item features, and Tumblr is built on them. The topics you pick at sign-up act as your starting user profile. |
 | **Collaborative filtering** | "Based on Your Likes" looks like item-item or user-user collaborative filtering. "Stuff in Your Orbit" is a *social* version, where your "similar users" are just the people you follow. |
-| **Popularity / engagement** | Best Stuff First and Trending rank by notes. Exactly how Tumblr weighs likes vs. reblogs vs. replies isn't public, but likes clearly matter since there's a whole feature built on them. |
+| **Popularity / engagement** | Best Stuff First and Trending appear to rank by notes. Exactly how Tumblr weighs likes vs. reblogs vs. replies isn't public, but likes clearly matter since there's a whole feature built on them. |
 | **Hybrid / blending** | StreamBuilder mixes several independent streams into one feed, which is the same "combine multiple models" lesson from the Netflix Prize. |
 | **Jaccard vs. cosine** | Since the data is mostly 1s and blanks, Jaccard-style similarity over likes, follows, or tags would make sense. (My guess, not confirmed.) |
 
@@ -136,28 +141,20 @@ flowchart LR
 
 ### Context That Affects What's Possible
 
-- **Small team.** After missing its 2023 growth goals, Tumblr refocused on core functionality with a smaller staff.
+- **Small team.** After its 2023 growth push, Tumblr moved most staff to other Automattic projects and switched to smaller teams focused on the core parts of the site ([TechCrunch](https://techcrunch.com/2023/11/09/tumblr-to-run-on-skeleton-crew-as-parent-company-automattic-absorbs-staff)).
 - **Backend migration on hold.** In 2025, Automattic paused moving Tumblr's backend to WordPress, with Mullenweg saying the focus would shift to what users actually ask for ([TechCrunch](https://techcrunch.com/2025/07/01/automattic-puts-tumblr-migration-to-wordpress-on-hold/)).
 
 In other words, any improvement has to be realistic for a small team.
 
 ## Recommendations for Improving Tumblr's Recommender
 
-1.  **Ship "Collections" to fix onboarding.** Tumblr Labs already floated the idea of followable collections of blogs and tags, curated around interests and moods. User-made "starter packs" (like "Broadway Tumblr 101") would solve cold start with *human* curation, which fits the culture way better than forcing an algorithmic feed on people.
+1.  **Ship "Collections" to fix onboarding.** Tumblr Labs has already floated the idea of followable collections of blogs and tags, curated around interests and moods. <!-- Add a link to the Tumblr Labs post about Collections here if you can find it. --> User-made "starter packs" (like "Broadway Tumblr 101") would solve cold start with *human* curation, which fits the culture way better than forcing an algorithmic feed on people.
 
-2.  **Add a "Why am I seeing this?" label to every injected post.** StreamBuilder already knows which stream each post came from (followed tag, Orbit, Based on Your Likes), so showing that should be cheap. Transparency builds trust with a user base that's suspicious of algorithms.
+2.  **Add a "Why am I seeing this?" label to every injected post.** StreamBuilder already knows which stream each post came from (followed tag, Orbit, Based on Your Likes), so showing that should be cheap. It gives users more control and helps them understand how their activity affects recommendations. Transparency also builds trust with a user base that's suspicious of algorithms.
 
+3.  **Let users pick (or build) their own algorithm.** Mullenweg has said he imagines users choosing their own algorithm ([TechCrunch](https://techcrunch.com/2023/08/23/automattic-ceo-matt-mullenweg-talks-future-of-tumblr-with-algorithmic-choice-ai-enhancements-and-more)). Since StreamBuilder is open source, Tumblr could let users choose from community-made feeds (like "reblogs with commentary only" or "small creators first"), similar to Bluesky's custom feeds. This would also bring the people currently using third-party extensions back to an official, supported experience.
 
-3.  **Let users pick (or build) their own algorithm.** Mullenweg has said he imagines users choosing their own algorithm ([TechCrunch](https://techcrunch.com/2023/08/23/automattic-ceo-matt-mullenweg-talks-future-of-tumblr-with-algorithmic-choice-ai-enhancements-and-more)). Since StreamBuilder is open source, Tumblr could let users choose from community-made feeds (like "reblogs with commentary only" or "small creators first"), similar to Bluesky's custom feeds.
-
-4.  **Fix popularity bias for small creators.** Ranking by raw note count rewards whatever's already viral (the long-tail problem from Chapter 9). Two specific fixes:
-
-    - Weight reblogs that add commentary or tags more heavily than bare likes.
-    - Add time decay, since old posts often recirculate on Tumblr for years.
-
-5.  **Treat accessibility as a recommendation feature.** Tumblr has a strong culture of image descriptions. Posts with alt text or image IDs could be tagged as a content feature, and users could get a toggle to prioritize described posts. As someone who works on WCAG compliance, I think this would help disabled users find content they can actually use, and reward creators who make their posts accessible.
-
-6.  **Measure success beyond engagement.** Learn from Netflix: the "most accurate" algorithm isn't automatically the right one. Tumblr should track how many new users stick around, how often people turn recommendation toggles *off*, and user satisfaction surveys, not just time-on-site.
+4.  **Reward meaningful engagement, not just virality.** Ranking by raw note count rewards whatever's already popular, which is the long-tail problem from Chapter 9. Tumblr could weight reblogs that add commentary or tags more heavily than bare likes, so smaller creators who spark real conversation get surfaced. It could also treat filtered tags, blocked blogs, community-label opt-outs, and a new "show me less of this" button as *negative* signals that downrank similar posts instead of just hiding one. This helps creators reach the right audience and helps everyone avoid content they don't want to see.
 
 ## Conclusion
 
@@ -170,16 +167,18 @@ The best path forward isn't picking a side. It's building recommendations that a
 
 ## References
 
+- Android Headlines. (2025, April). Tumblr is reportedly reviving as Gen Z take interest in the platform. <https://www.androidheadlines.com/2025/04/tumblr-is-reportedly-reviving-as-gen-z-take-interest-in-the-platform.html>
 - Automattic. *StreamBuilder* (GitHub repository). <https://github.com/Automattic/stream-builder>
-- Tumblr Staff. (2023). StreamBuilder: our open-source framework for powering your dashboard. \[Add URL\]
-- Tumblr Staff. (2023, July 10). Tumblr's Core Product Strategy. \[Add URL\]
-- Engadget. (2023). Tumblr's building a TikTok-inspired feed in bid to grow its user base. <https://www.engadget.com/tumblrs-building-a-tiktok-inspired-feed-in-bid-to-grow-its-user-base-220929704.html>
+- Britannica. Tumblr. <https://www.britannica.com/topic/Tumblr>
+- Engadget. (2023, July). Tumblr's building a TikTok-inspired feed in bid to grow its user base. <https://www.engadget.com/tumblrs-building-a-tiktok-inspired-feed-in-bid-to-grow-its-user-base-220929704.html>
+- Know Your Meme. 2023 Tumblr Changes. <https://knowyourmeme.com/memes/events/2023-tumblr-changes>
+- Leskovec, J., Rajaraman, A., & Ullman, J. D. *Mining of Massive Datasets*, Chapter 9: Recommendation Systems.
 - TechCrunch. (2022, Sept 27). No, Tumblr is not bringing back porn. <https://techcrunch.com/2022/09/27/tumblr-bring-back-porn-nsfw-community-labels>
+- TechCrunch. (2023, July 12). Tumblr is losing \$30M each year, CEO says. <https://techcrunch.com/2023/07/12/tumblr-is-losing-30m-each-year-ceo-says>
 - TechCrunch. (2023, Aug 23). Automattic CEO Matt Mullenweg talks future of Tumblr, with algorithmic choice, AI enhancements and more. <https://techcrunch.com/2023/08/23/automattic-ceo-matt-mullenweg-talks-future-of-tumblr-with-algorithmic-choice-ai-enhancements-and-more>
 - TechCrunch. (2023, Nov 9). Tumblr to run on skeleton crew as parent company Automattic absorbs staff. <https://techcrunch.com/2023/11/09/tumblr-to-run-on-skeleton-crew-as-parent-company-automattic-absorbs-staff>
-- TechCrunch. (2024, May 28). Tumblr launches its semi-private Communities in open beta. <https://techcrunch.com/2024/05/28/tumblr-launches-its-semi-private-communities-in-open-beta>
+- TechCrunch. (2024, Aug 28). Tumblr to move its half a billion blogs to WordPress. <https://techcrunch.com/2024/08/28/tumblr-to-move-its-half-a-billion-blogs-to-wordpress/>
+- TechCrunch. (2024, Dec). Tumblr launches its interest-focused Communities out of beta. <https://techcrunch.com/?p=2930485>
 - TechCrunch. (2025, July 1). Automattic puts Tumblr migration to WordPress on hold. <https://techcrunch.com/2025/07/01/automattic-puts-tumblr-migration-to-wordpress-on-hold/>
-- Android Headlines. (2025, April). Tumblr is reportedly reviving as Gen Z take interest in the platform. <https://www.androidheadlines.com/2025/04/tumblr-is-reportedly-reviving-as-gen-z-take-interest-in-the-platform.html>
-- Know Your Meme. 2023 Tumblr Changes. <https://knowyourmeme.com/memes/events/2023-tumblr-changes>
-- Britannica. Tumblr. <https://www.britannica.com/topic/Tumblr>
-- Leskovec, J., Rajaraman, A., & Ullman, J. D. *Mining of Massive Datasets*, Chapter 9: Recommendation Systems.
+- Tumblr Engineering. (2023). StreamBuilder: our open-source framework for powering your dashboard. <https://www.tumblr.com/engineering/722102563011493888/streambuilder-our-open-source-framework-for>
+- Tumblr Staff. (2023, July 10). Tumblr's Core Product Strategy. <https://staff.tumblr.com/post/722477242948747264/tumblrs-core-product-strategy>
